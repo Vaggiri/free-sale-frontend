@@ -126,7 +126,7 @@ p {
     margin: 0;
 }
 
-/* Desktop Navigation Menu */
+/* Desktop Navigation Menu - FIXED */
 .nav-menu {
     display: flex;
     align-items: center;
@@ -139,6 +139,9 @@ p {
     font-weight: 500;
     transition: var(--transition);
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .nav-link:hover {

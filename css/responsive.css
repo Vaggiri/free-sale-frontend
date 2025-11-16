@@ -35,7 +35,7 @@
 }
 
 @media (max-width: 768px) {
-    /* Mobile Navigation */
+    /* Mobile Navigation - FIXED */
     .nav-menu {
         display: none;
         position: fixed;
@@ -49,8 +49,8 @@
         box-shadow: 2px 0 15px rgba(0, 0, 0, 0.15);
         z-index: 999;
         gap: 0;
-        transition: transform 0.3s ease;
         transform: translateX(-100%);
+        transition: transform 0.3s ease;
     }
     
     .nav-menu.active {
@@ -60,11 +60,6 @@
     
     .nav-toggle {
         display: flex;
-        background: white;
-        border: 2px solid var(--primary-color);
-        border-radius: 6px;
-        padding: 8px;
-        z-index: 1000;
     }
     
     .nav-toggle .bar {
