@@ -59,6 +59,15 @@ class UIManager {
         console.log('✅ Event listeners setup complete');
     }
     
+    setupPageTransitions() {
+        console.log('🎭 Setting up page transitions...');
+        // Add transition classes to page elements
+        document.querySelectorAll('.page').forEach(page => {
+            page.classList.add('fade-in');
+        });
+        console.log('✅ Page transitions setup complete');
+    }
+    
     setupMobileEventListeners() {
         console.log('📱 Setting up mobile event listeners...');
         
@@ -66,14 +75,14 @@ class UIManager {
         const navMenu = document.querySelector('.nav-menu');
         const mobileOverlay = document.querySelector('.mobile-overlay');
 
-        // Hamburger menu toggle - FIXED
+        // Hamburger menu toggle
         if (navToggle) {
-            console.log('🍔 Hamburger element found:', navToggle);
+            console.log('🍔 Hamburger element found');
             
             navToggle.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🍔 Hamburger clicked - toggling menu');
+                console.log('🍔 Hamburger clicked');
                 this.toggleMobileMenu();
             });
             
@@ -107,6 +116,35 @@ class UIManager {
         });
 
         console.log('✅ Mobile event listeners setup complete');
+    }
+    
+    setupModalHandlers() {
+        console.log('🎪 Setting up modal handlers...');
+        
+        // Auth modal tabs
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const tab = e.target.getAttribute('data-tab');
+                this.switchAuthTab(tab);
+            });
+        });
+        
+        // Close buttons
+        document.querySelectorAll('.close').forEach(button => {
+            button.addEventListener('click', () => {
+                this.closeAllModals();
+            });
+        });
+        
+        // Profile tabs
+        document.querySelectorAll('.profile-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const tabName = e.target.getAttribute('data-tab');
+                this.switchProfileTab(tabName);
+            });
+        });
+        
+        console.log('✅ Modal handlers setup complete');
     }
     
     setupImageUpload() {
@@ -160,7 +198,7 @@ class UIManager {
                 triggerFileInput();
             });
             
-            // File input change - FIXED
+            // File input change
             fileInput.addEventListener('change', (e) => {
                 console.log('📁 File input changed, files:', e.target.files.length);
                 if (e.target.files.length > 0) {
@@ -188,11 +226,7 @@ class UIManager {
             
             console.log('✅ Image upload setup complete');
         } else {
-            console.error('❌ Image upload elements not found:', {
-                uploadArea: !!uploadArea,
-                fileInput: !!fileInput,
-                imagePreview: !!imagePreview
-            });
+            console.error('❌ Image upload elements not found');
         }
     }
     
@@ -278,11 +312,7 @@ class UIManager {
             document.body.style.overflow = 'hidden';
             console.log('✅ Mobile menu opened');
         } else {
-            console.error('❌ Mobile menu elements not found:', {
-                navMenu: !!navMenu,
-                navToggle: !!navToggle,
-                mobileOverlay: !!mobileOverlay
-            });
+            console.error('❌ Mobile menu elements not found');
         }
     }
     
@@ -347,10 +377,10 @@ class UIManager {
                 break;
             case 'profile':
                 if (authManager && authManager.isLoggedIn()) {
-                    // Force reload profile data
-                    if (window.ProfileManager) {
-                        console.log('👤 Loading user profile data...');
+                    if (window.ProfileManager && typeof window.ProfileManager.loadUserProfile === 'function') {
                         window.ProfileManager.loadUserProfile();
+                    }
+                    if (window.ProfileManager && typeof window.ProfileManager.loadUserListings === 'function') {
                         window.ProfileManager.loadUserListings();
                     }
                 } else {
@@ -622,6 +652,8 @@ class UIManager {
         }, 5000);
     }
 }
+
+// Initialize UI Manager - MAKE SURE THIS IS AT THE BOTTOM
 const uiManager = new UIManager();
 window.uiManager = uiManager;
 console.log('🌐 UIManager added to window');

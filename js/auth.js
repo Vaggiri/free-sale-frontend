@@ -56,8 +56,8 @@ class AuthManager {
                 console.log('✅ Login successful, user ID:', userId);
                 
                 this.updateUI();
-                uiManager.closeAllModals();
-                uiManager.showMessage('Login successful!');
+                if (window.uiManager) window.uiManager.closeAllModals();
+                if (window.uiManager) window.uiManager.showMessage('Login successful!');
                 
             } else {
                 uiManager.showMessage(data.message || 'Login failed', 'error');
@@ -95,7 +95,7 @@ class AuthManager {
         }
         
         try {
-            uiManager.showLoading();
+            if (window.uiManager) window.uiManager.showLoading();
             
             const response = await fetch(`${this.API_BASE}/auth/register`, {
                 method: 'POST',

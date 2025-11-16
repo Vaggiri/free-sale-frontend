@@ -1195,3 +1195,27 @@
         animation: none !important;
     }
 }
+/* FORCE HAMBURGER VISIBILITY ON MOBILE */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background: white !important;
+        border: 2px solid #4361ee !important;
+        border-radius: 6px;
+        padding: 8px 6px;
+        width: 44px;
+        height: 44px;
+    }
+    
+    .nav-toggle .bar {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background: #4361ee !important;
+        width: 20px !important;
+        height: 2px !important;
+        margin: 3px 0 !important;
+    }
+}
