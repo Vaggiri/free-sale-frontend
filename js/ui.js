@@ -8,7 +8,7 @@ class UIManager {
     init() {
         this.setupEventListeners();
         this.setupPageTransitions();
-        this.setupMobileEventListeners();
+        this.setupMobileEventListeners(); // This method was missing
         this.setupModalHandlers();
         this.setupImageUpload();
         this.handleResize();
@@ -41,43 +41,53 @@ class UIManager {
             });
         });
         
+        console.log('✅ Event listeners setup complete');
+    }
+    
+    // ADD THIS MISSING METHOD
+    setupMobileEventListeners() {
+        console.log('📱 Setting up mobile event listeners...');
+        
         // Mobile menu toggle
         const navToggle = document.querySelector('.nav-toggle');
         const navMenu = document.querySelector('.nav-menu');
+        const mobileOverlay = document.querySelector('.mobile-overlay');
 
-        if (navToggle) {
-            navToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('active');
-                navToggle.classList.toggle('active');
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.toggleMobileMenu();
             });
         }
 
-        // Close mobile menu when clicking on a link
+        if (mobileOverlay) {
+            mobileOverlay.addEventListener('click', () => {
+                this.closeMobileMenu();
+            });
+        }
+
+        // Close mobile menu when clicking on links
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
+                if (window.innerWidth <= 768) {
+                    this.closeMobileMenu();
+                }
             });
         });
 
-        // Close mobile menu when clicking outside
+        // Close menu when clicking outside on mobile
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav-container')) {
-                navMenu.classList.remove('active');
-                navToggle.classList.remove('active');
+            if (window.innerWidth <= 768 && navMenu && navMenu.classList.contains('active')) {
+                if (!e.target.closest('.nav-menu') && !e.target.closest('.nav-toggle')) {
+                    this.closeMobileMenu();
+                }
             }
         });
-        
-        // Close modals when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                this.closeAllModals();
-            }
-        });
+
+        console.log('✅ Mobile event listeners setup complete');
     }
     
     setupPageTransitions() {
-        // Add transition classes to page elements
         document.querySelectorAll('.page').forEach(page => {
             page.classList.add('fade-in');
         });
@@ -117,7 +127,6 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // Make upload area more touch-friendly
             uploadArea.style.cursor = 'pointer';
             uploadArea.style.minHeight = '120px';
             uploadArea.style.display = 'flex';
@@ -126,27 +135,24 @@ class UIManager {
             uploadArea.style.justifyContent = 'center';
             
             // Click handler
-            uploadArea.addEventListener('click', (e) => {
+            uploadArea.addEventListener('click', () => {
                 console.log('📱 Upload area clicked');
-                e.preventDefault();
                 fileInput.click();
             });
             
             // Touch events for mobile
             uploadArea.addEventListener('touchstart', (e) => {
-                console.log('📱 Touch start on upload area');
                 e.preventDefault();
                 uploadArea.style.backgroundColor = '#f0f0f0';
             });
             
             uploadArea.addEventListener('touchend', (e) => {
-                console.log('📱 Touch end on upload area');
                 e.preventDefault();
                 uploadArea.style.backgroundColor = '';
                 fileInput.click();
             });
             
-            // Drag and drop events
+            // Drag and drop
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('drag-over');
@@ -160,44 +166,22 @@ class UIManager {
                 e.preventDefault();
                 uploadArea.classList.remove('drag-over');
                 const files = e.dataTransfer.files;
-                console.log('📁 Files dropped:', files.length);
                 this.handleImageFiles(files);
             });
             
-            // File input change
             fileInput.addEventListener('change', (e) => {
-                console.log('📁 File input changed:', e.target.files.length);
                 this.handleImageFiles(e.target.files);
-            });
-            
-            // Prevent default behavior for file input
-            fileInput.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-        } else {
-            console.error('❌ Image upload elements not found:', {
-                uploadArea: !!uploadArea,
-                fileInput: !!fileInput,
-                imagePreview: !!imagePreview
             });
         }
     }
     
     handleImageFiles(files) {
-        console.log('🖼️ Handling image files:', files.length);
         const imagePreview = document.getElementById('image-preview');
-        if (!imagePreview) {
-            console.error('❌ Image preview container not found');
-            return;
-        }
+        if (!imagePreview) return;
         
         Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) {
-                console.log('❌ Skipping non-image file:', file.type);
-                return;
-            }
+            if (!file.type.startsWith('image/')) return;
             
-            console.log('✅ Processing image file:', file.name);
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewDiv = document.createElement('div');
@@ -213,13 +197,52 @@ class UIManager {
                 });
                 
                 imagePreview.appendChild(previewDiv);
-                console.log('✅ Image preview added');
-            };
-            reader.onerror = (error) => {
-                console.error('❌ Error reading file:', error);
             };
             reader.readAsDataURL(file);
         });
+    }
+    
+    // MOBILE MENU METHODS
+    toggleMobileMenu() {
+        const navMenu = document.querySelector('.nav-menu');
+        const navToggle = document.querySelector('.nav-toggle');
+        const mobileOverlay = document.querySelector('.mobile-overlay');
+        
+        if (navMenu && navToggle) {
+            const isActive = navMenu.classList.contains('active');
+            
+            if (isActive) {
+                this.closeMobileMenu();
+            } else {
+                this.openMobileMenu();
+            }
+        }
+    }
+    
+    openMobileMenu() {
+        const navMenu = document.querySelector('.nav-menu');
+        const navToggle = document.querySelector('.nav-toggle');
+        const mobileOverlay = document.querySelector('.mobile-overlay');
+        
+        if (navMenu && navToggle && mobileOverlay) {
+            navMenu.classList.add('active');
+            navToggle.classList.add('active');
+            mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    closeMobileMenu() {
+        const navMenu = document.querySelector('.nav-menu');
+        const navToggle = document.querySelector('.nav-toggle');
+        const mobileOverlay = document.querySelector('.mobile-overlay');
+        
+        if (navMenu && navToggle && mobileOverlay) {
+            navMenu.classList.remove('active');
+            navToggle.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
     
     navigateToPage(page) {
@@ -246,11 +269,8 @@ class UIManager {
             }
         });
         
-        // Close mobile menu if open
-        const navMenu = document.querySelector('.nav-menu');
-        if (navMenu) {
-            navMenu.classList.remove('active');
-        }
+        // Close mobile menu
+        this.closeMobileMenu();
         
         // Load page-specific content
         this.loadPageContent(page);
@@ -261,24 +281,21 @@ class UIManager {
         
         switch(page) {
             case 'find':
-                if (typeof productManager !== 'undefined' && productManager && typeof productManager.loadProducts === 'function') {
-                    productManager.loadProducts();
+                if (window.productManager && typeof window.productManager.loadProducts === 'function') {
+                    window.productManager.loadProducts();
                 } else {
                     console.error('❌ ProductManager not available for find page');
                 }
                 break;
             case 'profile':
-                console.log('👤 Loading profile page...');
                 if (authManager && authManager.isLoggedIn()) {
-                    // Load profile data
-                    if (typeof ProfileManager !== 'undefined' && ProfileManager && typeof ProfileManager.loadUserProfile === 'function') {
-                        ProfileManager.loadUserProfile();
+                    if (window.ProfileManager && typeof window.ProfileManager.loadUserProfile === 'function') {
+                        window.ProfileManager.loadUserProfile();
                     }
-                    if (typeof ProfileManager !== 'undefined' && ProfileManager && typeof ProfileManager.loadUserListings === 'function') {
-                        ProfileManager.loadUserListings();
+                    if (window.ProfileManager && typeof window.ProfileManager.loadUserListings === 'function') {
+                        window.ProfileManager.loadUserListings();
                     }
                 } else {
-                    console.log('❌ User not logged in, showing auth modal');
                     this.showAuthModal();
                     this.navigateToPage('home');
                 }
@@ -300,7 +317,6 @@ class UIManager {
     }
     
     switchAuthTab(tab) {
-        // Update tab buttons
         document.querySelectorAll('.tab-button').forEach(button => {
             button.classList.remove('active');
         });
@@ -309,7 +325,6 @@ class UIManager {
             activeTabButton.classList.add('active');
         }
         
-        // Update forms
         document.querySelectorAll('.auth-form').forEach(form => {
             form.classList.remove('active');
         });
@@ -320,7 +335,6 @@ class UIManager {
     }
     
     switchProfileTab(tab) {
-        // Update tab buttons
         document.querySelectorAll('.profile-tab').forEach(button => {
             button.classList.remove('active');
         });
@@ -329,7 +343,6 @@ class UIManager {
             activeTabButton.classList.add('active');
         }
         
-        // Update content
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
@@ -339,34 +352,21 @@ class UIManager {
         }
     }
     
-    // Product detail modal
     showProductDetail(product) {
         console.log('👆 Showing product detail:', product.title);
         const modal = document.getElementById('product-modal');
         const content = document.getElementById('product-detail-content');
         
-        if (!modal || !content) {
-            console.error('❌ Product modal elements not found');
-            return;
-        }
+        if (!modal || !content) return;
         
-        // Format category for display
         const categoryMap = {
-            'books': 'Books',
-            'electronics': 'Electronics', 
-            'cycles': 'Cycles',
-            'hostel-needs': 'Hostel Needs',
-            'accessories': 'Accessories',
-            'other': 'Other'
+            'books': 'Books', 'electronics': 'Electronics', 'cycles': 'Cycles',
+            'hostel-needs': 'Hostel Needs', 'accessories': 'Accessories', 'other': 'Other'
         };
         
-        // Format location for display
         const locationMap = {
-            'canteen': 'College Canteen',
-            'library': 'Library Entrance',
-            'main-gate': 'Main Gate',
-            'hostel': 'Hostel Common Area',
-            'other': 'Other Location'
+            'canteen': 'College Canteen', 'library': 'Library Entrance',
+            'main-gate': 'Main Gate', 'hostel': 'Hostel Common Area', 'other': 'Other Location'
         };
 
         content.innerHTML = `
@@ -376,7 +376,6 @@ class UIManager {
                 </button>
             </div>
             <div class="product-detail-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 1rem;">
-                <!-- Product Images -->
                 <div class="product-detail-images">
                     <div class="main-image" style="background: #f8f9fa; border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1rem;">
                         ${product.images && product.images.length > 0 ? 
@@ -391,7 +390,6 @@ class UIManager {
                     </div>
                 </div>
                 
-                <!-- Product Information -->
                 <div class="product-detail-info">
                     <h2 style="color: #212529; margin-bottom: 0.5rem; font-size: 1.8rem;">${product.title}</h2>
                     <p class="product-price" style="font-size: 2rem; font-weight: 700; color: #4361ee; margin-bottom: 1rem;">₹${product.price}</p>
@@ -410,7 +408,6 @@ class UIManager {
                         <p style="color: #6c757d; line-height: 1.6; white-space: pre-wrap;">${product.description}</p>
                     </div>
                     
-                    <!-- Seller Information -->
                     <div class="seller-info" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
                         <h3 style="color: #495057; margin-bottom: 1rem;">Seller Information</h3>
                         <div class="seller-details" style="display: flex; align-items: center; gap: 1rem;">
@@ -430,7 +427,6 @@ class UIManager {
                         </div>
                     </div>
                     
-                    <!-- Meetup Information -->
                     <div class="meetup-info" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
                         <h3 style="color: #495057; margin-bottom: 1rem;">Meetup Location</h3>
                         <p style="color: #6c757d; display: flex; align-items: center; gap: 0.5rem;">
@@ -439,7 +435,6 @@ class UIManager {
                         </p>
                     </div>
                     
-                    <!-- Contact Action -->
                     <div class="product-actions">
                         <button class="btn-primary btn-large" id="contact-seller" 
                                 style="width: 100%; padding: 1rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
@@ -451,7 +446,6 @@ class UIManager {
             </div>
         `;
         
-        // Add event listener for contact button
         const contactButton = document.getElementById('contact-seller');
         if (contactButton) {
             contactButton.addEventListener('click', () => {
@@ -459,30 +453,21 @@ class UIManager {
             });
         }
         
-        // Show mobile header on small screens
         if (window.innerWidth <= 768) {
             content.querySelector('.product-detail-mobile-header').style.display = 'block';
             content.querySelector('.product-detail-container').style.gridTemplateColumns = '1fr';
-            content.querySelector('.product-detail-container').style.gap = '1rem';
-            content.querySelector('.product-detail-container').style.padding = '0.5rem';
         }
 
         modal.classList.add('active');
     }
 
-    // Add helper method for image URLs
     getImageUrl(imagePath) {
         if (!imagePath) return '';
-        if (imagePath.startsWith('http')) {
-            return imagePath;
-        } else if (imagePath.startsWith('/')) {
-            return `https://free-sale-backend.onrender.com${imagePath}`;
-        } else {
-            return `https://free-sale-backend.onrender.com/uploads/${imagePath}`;
-        }
+        if (imagePath.startsWith('http')) return imagePath;
+        if (imagePath.startsWith('/')) return `https://free-sale-backend.onrender.com${imagePath}`;
+        return `https://free-sale-backend.onrender.com/uploads/${imagePath}`;
     }
 
-    // Update contactSeller method to use WhatsApp
     contactSeller(product) {
         const user = authManager.getCurrentUser();
         const sellerPhone = product.seller?.phone || '';
@@ -490,7 +475,7 @@ class UIManager {
         const userName = user ? encodeURIComponent(user.name) : 'Potential Buyer';
         
         if (!sellerPhone) {
-            uiManager.showMessage('Seller contact information not available', 'error');
+            this.showMessage('Seller contact information not available', 'error');
             return;
         }
         
@@ -529,35 +514,8 @@ class UIManager {
         return window.innerWidth <= 768;
     }
     
-    isTablet() {
-        return window.innerWidth > 768 && window.innerWidth <= 1024;
-    }
-    
-    isDesktop() {
-        return window.innerWidth > 1024;
-    }
-    
-    // Handle window resize
     handleResize() {
-        if (this.isMobile()) {
-            document.body.classList.add('mobile');
-            document.body.classList.remove('tablet', 'desktop');
-        } else if (this.isTablet()) {
-            document.body.classList.add('tablet');
-            document.body.classList.remove('mobile', 'desktop');
-        } else {
-            document.body.classList.add('desktop');
-            document.body.classList.remove('mobile', 'tablet');
-        }
-    }
-
-    toggleMobileMenu() {
-        const navMenu = document.querySelector('.nav-menu');
-        const navToggle = document.querySelector('.nav-toggle');
-        if (navMenu && navToggle) {
-            navMenu.classList.toggle('active');
-            navToggle.classList.toggle('active');
-        }
+        // Handle resize if needed
     }
 
     showLoading() {
@@ -602,5 +560,6 @@ class UIManager {
     }
 }
 
-// Initialize UI Manager
+// Initialize UI Manager - Make sure this is at the end
 const uiManager = new UIManager();
+window.uiManager = uiManager; // Make it globally available
