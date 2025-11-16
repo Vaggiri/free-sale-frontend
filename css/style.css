@@ -930,3 +930,28 @@ main {
     background: #ffc107 !important;
     color: #212529 !important;
 }
+/* Upload Area Drag & Drop State */
+.upload-area.dragover {
+    border-color: #4361ee !important;
+    background: #f0f8ff !important;
+    transform: scale(1.02);
+}
+
+/* Preview Image Styles */
+.preview-image {
+    transition: all 0.3s ease;
+}
+
+.preview-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.remove-image {
+    transition: all 0.3s ease;
+}
+
+.remove-image:hover {
+    background: rgba(220, 53, 69, 0.9) !important;
+    transform: scale(1.1);
+}

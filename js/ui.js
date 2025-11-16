@@ -156,27 +156,16 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // Reset any existing styles and setup
+            // Reset upload area content
             uploadArea.innerHTML = `
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>Click to upload or drag and drop</p>
                 <span>PNG, JPG, JPEG up to 5MB</span>
+                <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
             `;
             
-            // Make sure file input is properly placed inside upload area
-            uploadArea.appendChild(fileInput);
-            
-            // Style the file input properly
-            fileInput.style.cssText = `
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                opacity: 0 !important;
-                cursor: pointer !important;
-                z-index: 10 !important;
-            `;
+            // Get the newly created file input
+            const newFileInput = uploadArea.querySelector('#product-images');
             
             // Style upload area
             uploadArea.style.cssText = `
@@ -194,6 +183,19 @@ class UIManager {
                 justify-content: center !important;
                 background: #f8f9fa !important;
             `;
+            
+            // Style file input
+            newFileInput.style.cssText = `
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                opacity: 0 !important;
+                cursor: pointer !important;
+                z-index: 10 !important;
+            `;
+            
             console.log('📱 File input setup complete');
             
             // Add hover effects
@@ -207,16 +209,22 @@ class UIManager {
                 uploadArea.style.background = '#f8f9fa';
             });
             
-            // Click handler
+            // Click handler - using event delegation
             uploadArea.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('📱 Upload area clicked');
-                fileInput.click();
+                // Only trigger if clicking on the upload area itself, not on remove buttons
+                if (e.target === uploadArea || 
+                    e.target.tagName === 'I' || 
+                    e.target.tagName === 'P' || 
+                    e.target.tagName === 'SPAN') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('📱 Upload area clicked');
+                    newFileInput.click();
+                }
             });
             
             // File input change handler
-            fileInput.addEventListener('change', (e) => {
+            newFileInput.addEventListener('change', (e) => {
                 console.log('📁 File input changed, files:', e.target.files.length);
                 if (e.target.files.length > 0) {
                     this.handleImageFiles(e.target.files);
@@ -228,23 +236,34 @@ class UIManager {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#4361ee';
                 uploadArea.style.background = '#f0f8ff';
+                uploadArea.classList.add('dragover');
             });
             
             uploadArea.addEventListener('dragleave', (e) => {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#e9ecef';
                 uploadArea.style.background = '#f8f9fa';
+                uploadArea.classList.remove('dragover');
             });
             
             uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#e9ecef';
                 uploadArea.style.background = '#f8f9fa';
+                uploadArea.classList.remove('dragover');
                 
                 if (e.dataTransfer.files.length > 0) {
-                    fileInput.files = e.dataTransfer.files;
+                    console.log('📁 Files dropped:', e.dataTransfer.files.length);
+                    // Create a new DataTransfer to set files
+                    const dt = new DataTransfer();
+                    for (let file of e.dataTransfer.files) {
+                        dt.items.add(file);
+                    }
+                    newFileInput.files = dt.files;
+                    
+                    // Trigger change event
                     const event = new Event('change', { bubbles: true });
-                    fileInput.dispatchEvent(event);
+                    newFileInput.dispatchEvent(event);
                 }
             });
             
@@ -261,6 +280,7 @@ class UIManager {
     handleImageFiles(files) {
         console.log('🖼️ Handling image files:', files.length);
         const imagePreview = document.getElementById('image-preview');
+        const fileInput = document.getElementById('product-images');
         
         if (!imagePreview) {
             console.error('❌ Image preview container not found');
@@ -268,8 +288,8 @@ class UIManager {
             return;
         }
         
-        // Clear existing previews
-        imagePreview.innerHTML = '';
+        // Store current files
+        const currentFiles = fileInput.files ? Array.from(fileInput.files) : [];
         
         let processedFiles = 0;
         const maxFiles = 5; // Limit to 5 images
@@ -277,6 +297,8 @@ class UIManager {
         if (files.length > maxFiles) {
             this.showMessage(`Maximum ${maxFiles} images allowed. Only the first ${maxFiles} will be used.`, 'warning');
         }
+        
+        const validFiles = [];
         
         Array.from(files).slice(0, maxFiles).forEach((file, index) => {
             if (!file.type.startsWith('image/')) {
@@ -293,6 +315,7 @@ class UIManager {
             }
             
             console.log(`✅ Processing image ${index + 1}:`, file.name, file.type);
+            validFiles.push(file);
             
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -327,6 +350,9 @@ class UIManager {
                     e.stopPropagation();
                     previewDiv.remove();
                     console.log('🗑️ Image removed from preview');
+                    
+                    // Remove from file input
+                    this.removeFileFromInput(file.name);
                     this.updateImageCounter();
                 });
                 
@@ -343,12 +369,50 @@ class UIManager {
             reader.readAsDataURL(file);
         });
         
+        // Update file input with all valid files
+        this.updateFileInput(validFiles, currentFiles);
+        
         // Show success message after a short delay to allow processing
         setTimeout(() => {
             if (processedFiles > 0) {
                 this.showMessage(`✅ ${processedFiles} image(s) selected successfully`, 'success');
             }
         }, 500);
+    }
+    
+    // Helper method to update file input
+    updateFileInput(newFiles, currentFiles) {
+        const fileInput = document.getElementById('product-images');
+        const dt = new DataTransfer();
+        
+        // Add current files
+        currentFiles.forEach(file => dt.items.add(file));
+        
+        // Add new files (avoid duplicates)
+        newFiles.forEach(newFile => {
+            if (!currentFiles.some(existingFile => existingFile.name === newFile.name && existingFile.size === newFile.size)) {
+                dt.items.add(newFile);
+            }
+        });
+        
+        fileInput.files = dt.files;
+        console.log('📁 Updated file input with files:', dt.files.length);
+    }
+    
+    // Helper method to remove file from input
+    removeFileFromInput(fileName) {
+        const fileInput = document.getElementById('product-images');
+        const dt = new DataTransfer();
+        
+        // Add all files except the one to remove
+        for (let file of fileInput.files) {
+            if (file.name !== fileName) {
+                dt.items.add(file);
+            }
+        }
+        
+        fileInput.files = dt.files;
+        console.log('🗑️ Removed file from input:', fileName);
     }
     
     // ADD THIS HELPER METHOD
