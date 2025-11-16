@@ -194,7 +194,6 @@ class UIManager {
                 justify-content: center !important;
                 background: #f8f9fa !important;
             `;
-            
             console.log('📱 File input setup complete');
             
             // Add hover effects
@@ -353,8 +352,6 @@ class UIManager {
     }
     
     // ADD THIS HELPER METHOD
-
-    
     updateImageCounter() {
         const imagePreview = document.getElementById('image-preview');
         const previewImages = imagePreview.querySelectorAll('.preview-image');

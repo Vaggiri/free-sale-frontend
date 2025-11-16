@@ -209,20 +209,14 @@
                             <div class="form-group">
                                 <label for="product-images">Upload Images</label>
                                 <div class="image-upload">
-                                    <!-- SIMPLE FILE INPUT APPROACH -->
-                                    <input type="file" 
-                                           id="product-images" 
-                                           name="images" 
-                                           multiple 
-                                           accept="image/*"
-                                           style="width: 100%; padding: 1rem; border: 2px dashed #e9ecef; border-radius: 8px; background: #f8f9fa; cursor: pointer;"
-                                           onchange="uiManager.handleImageFiles(this.files)">
-                                    
+                                    <div class="upload-area" id="upload-area" onclick="fixFileUpload();">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Click to upload or drag and drop</p>
+                                        <span>PNG, JPG, JPEG up to 5MB</span>
+                                        <!-- FILE INPUT MUST BE HERE -->
+                                        <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
+                                    </div>
                                     <div class="image-preview" id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;"></div>
-                                    
-                                    <p style="text-align: center; color: #6c757d; font-size: 0.9rem; margin-top: 0.5rem;">
-                                        <i class="fas fa-info-circle"></i> Select multiple images (PNG, JPG, JPEG up to 5MB each)
-                                    </p>
                                 </div>
                             </div>
                         
@@ -375,6 +369,48 @@
     
     console.log('Menu active:', menu.classList.contains('active'));
     console.log('Menu display:', window.getComputedStyle(menu).display);
+}
+function fixFileUpload() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('product-images');
+    
+    if (!fileInput) {
+        console.error('❌ File input not found');
+        return;
+    }
+    
+    // Remove and recreate file input
+    const newFileInput = document.createElement('input');
+    newFileInput.type = 'file';
+    newFileInput.id = 'product-images';
+    newFileInput.name = 'images';
+    newFileInput.multiple = true;
+    newFileInput.accept = 'image/*';
+    newFileInput.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        opacity: 1;
+        z-index: 10000;
+    `;
+    
+    document.body.appendChild(newFileInput);
+    
+    newFileInput.addEventListener('change', function(e) {
+        console.log('🎉 FILE SELECTED!', e.target.files);
+        if (window.uiManager && e.target.files.length > 0) {
+            window.uiManager.handleImageFiles(e.target.files);
+        }
+        // Remove this temporary input
+        document.body.removeChild(newFileInput);
+    });
+    
+    // Trigger click
+    setTimeout(() => {
+        newFileInput.click();
+    }, 100);
 }
 
 </script>
