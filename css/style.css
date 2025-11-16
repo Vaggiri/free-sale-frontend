@@ -163,6 +163,10 @@ p {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    z-index: 1001;
 }
 
 .bar {
@@ -171,6 +175,7 @@ p {
     background-color: var(--dark-color);
     margin: 3px 0;
     transition: var(--transition);
+    border-radius: 2px;
 }
 
 /* Main Content */
@@ -196,6 +201,7 @@ main {
     gap: 3rem;
     align-items: center;
     padding: 3rem 0;
+    margin-bottom: 4rem;
 }
 
 .hero-title {
@@ -263,7 +269,7 @@ main {
 
 /* Features Section */
 .features-section {
-    padding: 4rem 0;
+    padding: 4rem 0 2rem 0;
     text-align: center;
 }
 
@@ -531,6 +537,11 @@ main {
     text-align: center;
     cursor: pointer;
     transition: var(--transition);
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .upload-area:hover {
@@ -952,5 +963,49 @@ main {
     
     .product-detail-images img {
         max-height: 250px !important;
+    }
+}
+
+/* Floating cards container */
+.floating-cards-container {
+    position: relative;
+    height: 400px;
+    overflow: visible;
+}
+
+/* Prevent horizontal scrolling */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Improve touch targets */
+@media (max-width: 768px) {
+    button, .btn-primary, .btn-secondary, .btn-outline,
+    .nav-link, .profile-tab, .tab-button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Prevent zoom on iOS inputs */
+    input, select, textarea {
+        font-size: 16px;
+    }
+}
+
+/* Make sure hamburger is visible on mobile */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex !important;
+    }
+    
+    /* Ensure good contrast */
+    .nav-toggle .bar {
+        background-color: var(--primary-color);
+        box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    }
+    
+    .nav-toggle.active .bar {
+        background-color: var(--primary-color);
     }
 }

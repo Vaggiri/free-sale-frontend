@@ -193,7 +193,27 @@ document.addEventListener('DOMContentLoaded', function() {
         const imagePreview = document.getElementById('image-preview');
         
         if (uploadArea && fileInput && imagePreview) {
+            // Make upload area more touch-friendly
+            uploadArea.style.cursor = 'pointer';
+            uploadArea.style.minHeight = '120px';
+            uploadArea.style.display = 'flex';
+            uploadArea.style.flexDirection = 'column';
+            uploadArea.style.alignItems = 'center';
+            uploadArea.style.justifyContent = 'center';
+            
             uploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Add touch events for mobile
+            uploadArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '#f0f0f0';
+            });
+            
+            uploadArea.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = '';
                 fileInput.click();
             });
             

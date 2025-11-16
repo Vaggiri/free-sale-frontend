@@ -26,7 +26,7 @@
         height: 100vh;
         background: white;
         flex-direction: column;
-        padding: 4rem 1.5rem 2rem;
+        padding: 5rem 1.5rem 2rem;
         box-shadow: 5px 0 25px rgba(0, 0, 0, 0.15);
         z-index: 1000;
         transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -85,7 +85,7 @@
     .bar {
         width: 24px;
         height: 2.5px;
-        background-color: var(--dark-color);
+        background-color: var(--primary-color);
         transition: all 0.3s ease;
         border-radius: 2px;
     }
@@ -118,12 +118,27 @@
         display: block;
     }
 
+    /* Make sure back button is visible */
+    .back-button {
+        display: flex !important;
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        font-size: 1rem;
+        cursor: pointer;
+        z-index: 1002;
+    }
+
     /* Hero section - mobile optimized */
     .hero-section {
         grid-template-columns: 1fr;
         gap: 2.5rem;
         padding: 1.5rem 0 2.5rem;
         text-align: center;
+        margin-bottom: 2rem;
     }
 
     .hero-title {
@@ -423,6 +438,7 @@
         padding: 2rem 1.5rem;
         border-radius: 12px;
         border: 2px dashed #d1d9e6;
+        min-height: 120px !important;
     }
 
     .upload-area i {
@@ -433,6 +449,7 @@
     .upload-area p {
         font-size: 0.95rem;
         margin-bottom: 0.5rem;
+        text-align: center;
     }
 
     .upload-area span {
@@ -440,9 +457,13 @@
     }
 
     .preview-image {
-        width: 70px;
-        height: 70px;
+        width: 80px !important;
+        height: 80px !important;
         border-radius: 8px;
+    }
+
+    .image-preview {
+        justify-content: center;
     }
 
     /* Profile mobile fixes */
@@ -483,6 +504,40 @@
         background: white;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         color: var(--primary-color);
+    }
+
+    /* Profile listings mobile fixes */
+    .listing-card {
+        padding: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .listing-card > div {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    
+    .listing-image {
+        width: 100% !important;
+        height: 200px !important;
+    }
+    
+    .listing-actions {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        margin-top: 1rem;
+    }
+    
+    .listing-actions button {
+        flex: 1;
+        margin: 0 0.25rem;
+        padding: 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .listing-price {
+        font-size: 1.25rem !important;
     }
 
     /* Modal improvements */
@@ -592,28 +647,6 @@
 
     .feature-card {
         padding: 1rem;
-    }
-}
-
-/* Prevent horizontal scrolling and improve touch */
-html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-}
-
-/* Improved touch targets */
-@media (max-width: 767px) {
-    .btn-primary, .btn-secondary, .btn-outline,
-    .nav-link, .profile-tab, .tab-button {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Prevent zoom on iOS inputs */
-    input, select, textarea {
-        font-size: 16px;
     }
 }
 
