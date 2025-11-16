@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <div id="auth-modal" class="modal">
@@ -69,6 +70,9 @@
                 <a href="#" class="nav-link" data-page="sell">Sell</a>
                 <a href="#" class="nav-link" data-page="profile">Profile</a>
                 <button id="auth-button" class="btn-outline">Login</button>
+                <button onclick="enableNotifications()" class="btn-outline" style="margin-left: 1rem;">
+                    <i class="fas fa-bell"></i> Enable Notifications
+                </button>
             </div>
             <div class="nav-toggle">
                 <span class="bar"></span>
@@ -192,7 +196,7 @@
             </div>
             
             <div class="sell-form-container">
-                <form id="sell-form" class="sell-form">
+                <form id="sell-form" class="sell-form" enctype="multipart/form-data">
                     <div class="form-section">
                         <h3>Product Details</h3>
                         
@@ -204,7 +208,7 @@
                                     <p>Click to upload or drag and drop</p>
                                     <span>PNG, JPG, JPEG up to 5MB</span>
                                 </div>
-                                <input type="file" id="product-images" multiple accept="image/*" style="display: none;">
+                                <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
                                 <div class="image-preview" id="image-preview"></div>
                             </div>
                         </div>
@@ -329,10 +333,12 @@
         <div class="spinner-circle"></div>
     </div>
 
+    <!-- Your existing scripts -->
     <script src="js/ui.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/products.js"></script>
     <script src="js/profile.js"></script>
-    <script src="js/app.js"></script>>
+    <script src="js/notifications.js"></script> <!-- Add this -->
+    <script src="js/app.js"></script>
 </body>
 </html>

@@ -177,23 +177,29 @@ class UIManager {
         // Load page-specific content
         this.loadPageContent(page);
     }
-    
     loadPageContent(page) {
+        console.log(`🔄 Loading page: ${page}`);
+        
         switch(page) {
             case 'find':
-                if (productManager && typeof productManager.loadProducts === 'function') {
+                if (typeof productManager !== 'undefined' && productManager && typeof productManager.loadProducts === 'function') {
                     productManager.loadProducts();
+                } else {
+                    console.error('❌ ProductManager not available for find page');
                 }
                 break;
             case 'profile':
-                if (authManager && typeof authManager.isLoggedIn === 'function' && authManager.isLoggedIn()) {
-                    if (ProfileManager && typeof ProfileManager.loadUserProfile === 'function') {
+                console.log('👤 Loading profile page...');
+                if (authManager && authManager.isLoggedIn()) {
+                    // Load profile data
+                    if (typeof ProfileManager !== 'undefined' && ProfileManager && typeof ProfileManager.loadUserProfile === 'function') {
                         ProfileManager.loadUserProfile();
                     }
-                    if (ProfileManager && typeof ProfileManager.loadUserListings === 'function') {
+                    if (typeof ProfileManager !== 'undefined' && ProfileManager && typeof ProfileManager.loadUserListings === 'function') {
                         ProfileManager.loadUserListings();
                     }
                 } else {
+                    console.log('❌ User not logged in, showing auth modal');
                     this.showAuthModal();
                     this.navigateToPage('home');
                 }

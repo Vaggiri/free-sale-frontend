@@ -12,17 +12,21 @@ class AuthManager {
     }
     
     setupEventListeners() {
-        // Login form
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleLogin();
-        });
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleLogin();
+            });
+        }
         
-        // Signup form
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleSignup();
-        });
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) {
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleSignup();
+            });
+        }
     }
     
     async handleLogin() {
@@ -45,15 +49,16 @@ class AuthManager {
             if (data.success) {
                 this.currentUser = data.user;
                 localStorage.setItem('token', data.token);
+                // Store user ID properly - use _id if available, otherwise id
+                const userId = data.user._id || data.user.id;
+                localStorage.setItem('userId', userId);
+                
+                console.log('✅ Login successful, user ID:', userId);
+                
                 this.updateUI();
                 uiManager.closeAllModals();
                 uiManager.showMessage('Login successful!');
                 
-                // Refresh page content
-                if (uiManager.currentPage === 'profile') {
-                    ProfileManager.loadUserProfile();
-                    ProfileManager.loadUserListings();
-                }
             } else {
                 uiManager.showMessage(data.message || 'Login failed', 'error');
             }
@@ -73,7 +78,6 @@ class AuthManager {
         const password = document.getElementById('signup-password').value;
         const confirmPassword = document.getElementById('signup-confirm-password').value;
         
-        // WhatsApp number validation
         if (!this.isValidPhoneNumber(phone)) {
             uiManager.showMessage('Please enter a valid WhatsApp number with country code (e.g., +919876543210)', 'error');
             return;
@@ -84,7 +88,6 @@ class AuthManager {
             return;
         }
         
-        // Basic college email validation
         if (!this.isValidCollegeEmail(email)) {
             if (!confirm('This email doesn\'t appear to be a college email. Continue anyway?')) {
                 return;
@@ -114,7 +117,6 @@ class AuthManager {
             if (data.success) {
                 uiManager.showMessage('Account created successfully! Please login.');
                 uiManager.switchAuthTab('login');
-                // Pre-fill login form
                 document.getElementById('login-email').value = email;
             } else {
                 uiManager.showMessage(data.message || 'Registration failed', 'error');
@@ -127,26 +129,30 @@ class AuthManager {
         }
     }
     
-    // Add phone validation method
+    isValidCollegeEmail(email) {
+        const collegeDomains = ['.edu', 'ac.in', 'college', 'university'];
+        return collegeDomains.some(domain => email.includes(domain));
+    }
+    
     isValidPhoneNumber(phone) {
-        // Basic international phone number validation
         const phoneRegex = /^\+[1-9]\d{1,14}$/;
         return phoneRegex.test(phone);
     }
     
-    isValidCollegeEmail(email) {
-        // Basic college email validation
-        const collegeDomains = ['.amrita.edu', '.edu', '.ac.in'];
-        return collegeDomains.some(domain => email.includes(domain));
-    }
-    
     generateStudentId() {
-        // Generate a random student ID for testing
         return 'STU' + Math.random().toString(36).substr(2, 9).toUpperCase();
     }
     
     getAuthToken() {
         return localStorage.getItem('token');
+    }
+    
+    getUserId() {
+        // First try to get from currentUser, then from localStorage
+        if (this.currentUser && (this.currentUser._id || this.currentUser.id)) {
+            return this.currentUser._id || this.currentUser.id;
+        }
+        return localStorage.getItem('userId');
     }
     
     async checkAuthStatus() {
@@ -162,29 +168,41 @@ class AuthManager {
                 if (response.ok) {
                     const data = await response.json();
                     this.currentUser = data.user;
+                    // Store user ID properly
+                    const userId = data.user._id || data.user.id;
+                    localStorage.setItem('userId', userId);
+                    
+                    console.log('✅ Auth status: User is logged in, ID:', userId);
                     this.updateUI();
                 } else {
-                    // Token is invalid
-                    localStorage.removeItem('token');
+                    console.log('❌ Auth status: Token invalid');
+                    this.logout();
                 }
             } catch (error) {
                 console.error('Auth check error:', error);
-                localStorage.removeItem('token');
+                this.logout();
             }
+        } else {
+            console.log('🔐 Auth status: No token found');
         }
         this.updateUI();
     }
     
     updateUI() {
         const authButton = document.getElementById('auth-button');
+        if (!authButton) return;
         
         if (this.isLoggedIn()) {
             authButton.textContent = 'Logout';
             authButton.onclick = () => this.logout();
             
-            // Update profile if on profile page
             if (uiManager.currentPage === 'profile') {
-                ProfileManager.loadUserProfile();
+                if (ProfileManager && typeof ProfileManager.loadUserProfile === 'function') {
+                    ProfileManager.loadUserProfile();
+                }
+                if (ProfileManager && typeof ProfileManager.loadUserListings === 'function') {
+                    ProfileManager.loadUserListings();
+                }
             }
         } else {
             authButton.textContent = 'Login';
@@ -199,13 +217,15 @@ class AuthManager {
     logout() {
         this.currentUser = null;
         localStorage.removeItem('token');
+        localStorage.removeItem('userId');
         this.updateUI();
         uiManager.showMessage('Logged out successfully');
         
-        // If on profile page, redirect to home
         if (uiManager.currentPage === 'profile') {
             uiManager.navigateToPage('home');
         }
+        
+        console.log('👋 User logged out');
     }
     
     getCurrentUser() {
@@ -213,5 +233,4 @@ class AuthManager {
     }
 }
 
-// Initialize Auth Manager
 const authManager = new AuthManager();
