@@ -149,6 +149,8 @@ class UIManager {
     
     setupImageUpload() {
         console.log('🖼️ Setting up image upload...');
+        
+        // Setup for sell form
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('product-images');
         const imagePreview = document.getElementById('image-preview');
@@ -156,7 +158,7 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // FIX: Proper file input styling for mobile
+            // Your existing sell form setup code...
             fileInput.setAttribute('accept', 'image/*');
             fileInput.setAttribute('multiple', 'true');
             fileInput.style.cssText = `
@@ -168,79 +170,94 @@ class UIManager {
                 opacity: 0 !important;
                 cursor: pointer !important;
                 z-index: 10 !important;
-                font-size: 100px !important; /* Makes it easier to tap */
+                font-size: 100px !important;
             `;
             
-            // Ensure upload area is properly positioned
             uploadArea.style.position = 'relative';
             uploadArea.style.overflow = 'hidden';
             uploadArea.style.cursor = 'pointer';
             
-            console.log('📱 File input dimensions:', {
-                width: fileInput.offsetWidth,
-                height: fileInput.offsetHeight,
-                computedWidth: window.getComputedStyle(fileInput).width,
-                computedHeight: window.getComputedStyle(fileInput).height
-            });
-            
-            // Simple click handler
             uploadArea.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('📱 Upload area clicked');
                 fileInput.click();
             });
             
-            // File input change handler
             fileInput.addEventListener('change', (e) => {
                 console.log('📁 File input changed, files:', e.target.files.length);
                 if (e.target.files.length > 0) {
                     this.handleImageFiles(e.target.files);
-                    // Reset to allow selecting same files again
                     fileInput.value = '';
                 }
             });
-            
-            console.log('✅ Image upload setup complete');
-        } else {
-            console.error('❌ Image upload elements not found');
         }
+        
+        // ADD THIS: Setup for any other file inputs in the app
+        this.setupGenericFileInputs();
     }
     
-    handleImageFiles(files) {
+    // ADD THIS NEW METHOD
+    setupGenericFileInputs() {
+        // Setup for any file inputs that might be added dynamically
+        document.addEventListener('change', (e) => {
+            if (e.target.type === 'file' && e.target.matches('#find-file-input, .generic-file-input')) {
+                this.handleImageFiles(e.target.files);
+            }
+        });
+    }
+    
+    handleImageFiles(files, customPreviewContainer = null) {
         console.log('🖼️ Handling image files:', files.length);
-        const imagePreview = document.getElementById('image-preview');
+        
+        // Use custom container if provided, otherwise default to sell form preview
+        const imagePreview = customPreviewContainer || document.getElementById('image-preview');
+        
         if (!imagePreview) {
             console.error('❌ Image preview container not found');
+            this.showMessage('Image preview area not found', 'error');
             return;
         }
         
-        // Clear existing previews
-        imagePreview.innerHTML = '';
+        // Clear existing previews only if it's the sell form (you might want to keep this configurable)
+        if (!customPreviewContainer) {
+            imagePreview.innerHTML = '';
+        }
+        
+        let validFiles = 0;
         
         Array.from(files).forEach((file, index) => {
             if (!file.type.startsWith('image/')) {
                 console.log('❌ Skipping non-image file:', file.type);
+                this.showMessage(`Skipped non-image file: ${file.name}`, 'warning');
+                return;
+            }
+            
+            // Check file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                console.log('❌ File too large:', file.name, file.size);
+                this.showMessage(`File too large (max 5MB): ${file.name}`, 'error');
                 return;
             }
             
             console.log(`✅ Processing image ${index + 1}:`, file.name, file.type);
+            validFiles++;
             
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewDiv = document.createElement('div');
                 previewDiv.className = 'preview-image';
                 previewDiv.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <button class="remove-image" type="button">×</button>
+                    <img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button class="remove-image" type="button" data-filename="${file.name}">×</button>
                 `;
                 
-                // Remove image on click
                 const removeBtn = previewDiv.querySelector('.remove-image');
                 removeBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     previewDiv.remove();
-                    console.log('🗑️ Image removed from preview');
+                    console.log('🗑️ Image removed from preview:', file.name);
+                    this.showMessage(`Removed: ${file.name}`, 'info');
                 });
                 
                 imagePreview.appendChild(previewDiv);
@@ -249,15 +266,20 @@ class UIManager {
             
             reader.onerror = (error) => {
                 console.error('❌ Error reading file:', error);
+                this.showMessage(`Error reading file: ${file.name}`, 'error');
             };
             
             reader.readAsDataURL(file);
         });
         
         // Show success message
-        if (files.length > 0) {
-            this.showMessage(`✅ ${files.length} image(s) selected`, 'success');
+        if (validFiles > 0) {
+            this.showMessage(`✅ ${validFiles} image(s) selected successfully`, 'success');
+        } else {
+            this.showMessage('No valid images selected', 'warning');
         }
+        
+        return validFiles > 0;
     }
     
     // MOBILE MENU METHODS
