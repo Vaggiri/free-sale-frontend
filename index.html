@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusTrade - College Marketplace</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="auth-tabs">
+                <button class="tab-button active" data-tab="login">Login</button>
+                <button class="tab-button" data-tab="signup">Sign Up</button>
+            </div>
+            <div id="login-form" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <input type="email" id="login-email" placeholder="College Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="login-password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+            </div>
+            <div id="signup-form" class="auth-form">
+                <h2>Join CampusTrade</h2>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <input type="text" id="signup-name" placeholder="Full Name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="signup-email" placeholder="College Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="signup-college" placeholder="Amrita Vishwa Vidyapeetham" value="Amrita Vishwa Vidyapeetham" readonly required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="signup-phone" placeholder="WhatsApp Number (with country code)" required>
+                        <small style="color: #6c757d; font-size: 0.8rem;">Example: +919876543210</small>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="signup-password" placeholder="Password" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1><i class="fas fa-graduation-cap"></i> CampusTrade</h1>
+            </div>
+            <div class="nav-menu">
+                <a href="#" class="nav-link" data-page="home">Home</a>
+                <a href="#" class="nav-link" data-page="find">Find</a>
+                <a href="#" class="nav-link" data-page="sell">Sell</a>
+                <a href="#" class="nav-link" data-page="profile">Profile</a>
+                <button id="auth-button" class="btn-outline">Login</button>
+            </div>
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <section id="home-page" class="page active">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Buy & Sell at Amrita</h1>
+                    <p class="hero-subtitle">Connect with fellow students to trade textbooks, electronics, and more.</p>
+                    <div class="hero-buttons">
+                        <button class="btn-primary btn-large" data-page="find">
+                            <i class="fas fa-search"></i> Find Items
+                        </button>
+                        <button class="btn-secondary btn-large" data-page="sell">
+                            <i class="fas fa-tag"></i> Sell Items
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-book"></i>
+                        <p>Textbooks</p>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-laptop"></i>
+                        <p>Electronics</p>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-bicycle"></i>
+                        <p>Bicycles</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="features-section">
+                <h2>Why Use CampusTrade?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>College Verified</h3>
+                        <p>Only verified Amrita students can join our platform.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <h3>Safe Meetups</h3>
+                        <p>Predefined safe locations within campus for transactions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Ratings & Reviews</h3>
+                        <p>Rate sellers after transactions for community trust.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="developer-credit-section" style="text-align: center; padding: 40px 0; border-top: 1px solid #eee; margin-top: 50px;">
+                <p style="font-size: 0.9rem; color: #6c757d;">
+                    Developed with 💖 by <b>Girisudhan V </b>(2nd Year ECE, Amrita Vishwa Vidyapeetham).
+                </p>
+            </div>
+            </section>
+
+        <section id="find-page" class="page">
+            <div class="page-header">
+                <h1>Find Items</h1>
+                <p>Browse products listed by students in your college</p>
+            </div>
+            
+            <div class="search-filters">
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="Search for products...">
+                    <button id="search-button"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <div class="filter-options">
+                    <div class="filter-group">
+                        <label for="category-filter">Category</label>
+                        <select id="category-filter">
+                            <option value="">All Categories</option>
+                            <option value="books">Books</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="cycles">Cycles</option>
+                            <option value="hostel-needs">Hostel Needs</option>
+                            <option value="accessories">Accessories</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="price-min">Price Range</label>
+                        <div class="price-range">
+                            <input type="number" id="price-min" placeholder="Min">
+                            <span>to</span>
+                            <input type="number" id="price-max" placeholder="Max">
+                        </div>
+                    </div>
+                    
+                    <button id="apply-filters" class="btn-primary">Apply Filters</button>
+                </div>
+            </div>
+            
+            <div class="products-grid" id="products-container">
+                </div>
+        </section>
+
+        <section id="sell-page" class="page">
+            <div class="page-header">
+                <h1>Sell an Item</h1>
+                <p>List your product to sell to other students</p>
+            </div>
+            
+            <div class="sell-form-container">
+                <form id="sell-form" class="sell-form">
+                    <div class="form-section">
+                        <h3>Product Details</h3>
+                        
+                        <div class="form-group">
+                            <label for="product-images">Upload Images</label>
+                            <div class="image-upload">
+                                <div class="upload-area" id="upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Click to upload or drag and drop</p>
+                                    <span>PNG, JPG, JPEG up to 5MB</span>
+                                </div>
+                                <input type="file" id="product-images" multiple accept="image/*" style="display: none;">
+                                <div class="image-preview" id="image-preview"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="product-title">Product Title</label>
+                            <input type="text" id="product-title" placeholder="e.g., Calculus Textbook, 2nd Edition" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="product-description">Description</label>
+                            <textarea id="product-description" placeholder="Describe your product..." rows="4" required></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-price">Price (₹)</label>
+                                <input type="number" id="product-price" placeholder="0.00" min="0" step="0.01" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="product-category">Category</label>
+                                <select id="product-category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="books">Books</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="cycles">Cycles</option>
+                                    <option value="hostel-needs">Hostel Needs</option>
+                                    <option value="accessories">Accessories</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-condition">Condition</label>
+                                <select id="product-condition" required>
+                                    <option value="good">Good</option>
+                                    <option value="new">New</option>
+                                    <option value="like-new">Like New</option>
+                                    <option value="fair">Fair</option>
+                                    <option value="poor">Poor</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Meetup Details</h3>
+                        
+                        <div class="form-group">
+                            <label for="meetup-location">Preferred Meetup Location</label>
+                            <select id="meetup-location" required>
+                                <option value="">Select Location</option>
+                                <option value="canteen">College Canteen</option>
+                                <option value="library">Library Entrance</option>
+                                <option value="main-gate">Main Gate</option>
+                                <option value="hostel">Hostel Common Area</option>
+                                <option value="other">Other (Specify in description)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary btn-large">List Product</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="profile-page" class="page">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-info">
+                    <h1 id="profile-name">User Name</h1>
+                    <p id="profile-college">Amrita Vishwa Vidyapeetham</p>
+                    <div class="profile-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span id="profile-rating-value">4.5</span>
+                    </div>
+                </div>
+                <button id="edit-profile" class="btn-outline">Edit Profile</button>
+            </div>
+            
+            <div class="profile-tabs">
+                <button class="profile-tab active" data-tab="listings">My Listings</button>
+                <button class="profile-tab" data-tab="reviews">Reviews</button>
+            </div>
+            
+            <div class="profile-content">
+                <div id="listings-tab" class="tab-content active">
+                    <h2>My Listings</h2>
+                    <div class="listings-container" id="user-listings">
+                        </div>
+                </div>
+                
+                <div id="reviews-tab" class="tab-content">
+                    <h2>Reviews</h2>
+                    <div class="reviews-container" id="user-reviews">
+                        </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content product-detail">
+            <span class="close">&times;</span>
+            <div id="product-detail-content">
+                </div>
+        </div>
+    </div>
+
+    <div id="loading-spinner" class="spinner">
+        <div class="spinner-circle"></div>
+    </div>
+
+    <script src="js/ui.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/app.js"></script>>
+</body>
+</html>
