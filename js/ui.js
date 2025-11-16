@@ -156,49 +156,37 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // Reset and style file input for mobile
+            // FIX: Proper file input styling for mobile
             fileInput.setAttribute('accept', 'image/*');
             fileInput.setAttribute('multiple', 'true');
-            fileInput.style.display = 'block';
-            fileInput.style.position = 'absolute';
-            fileInput.style.width = '100%';
-            fileInput.style.height = '100%';
-            fileInput.style.top = '0';
-            fileInput.style.left = '0';
-            fileInput.style.opacity = '0';
-            fileInput.style.cursor = 'pointer';
-            fileInput.style.zIndex = '10';
-            fileInput.style.fontSize = '100px'; // Make it easier to tap
+            fileInput.style.cssText = `
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                opacity: 0 !important;
+                cursor: pointer !important;
+                z-index: 10 !important;
+                font-size: 100px !important; /* Makes it easier to tap */
+            `;
             
-            // Ensure upload area is clickable
+            // Ensure upload area is properly positioned
             uploadArea.style.position = 'relative';
             uploadArea.style.overflow = 'hidden';
             uploadArea.style.cursor = 'pointer';
             
-            console.log('📱 File input styled for mobile:', {
+            console.log('📱 File input dimensions:', {
                 width: fileInput.offsetWidth,
                 height: fileInput.offsetHeight,
-                position: fileInput.style.position
+                computedWidth: window.getComputedStyle(fileInput).width,
+                computedHeight: window.getComputedStyle(fileInput).height
             });
             
-            // Simple click handler - MOST RELIABLE FOR MOBILE
+            // Simple click handler
             uploadArea.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('📱 Upload area clicked');
-                fileInput.click();
-            });
-            
-            // Touch events as backup
-            uploadArea.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '#f0f8ff';
-                uploadArea.style.borderColor = '#4361ee';
-            });
-            
-            uploadArea.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                uploadArea.style.backgroundColor = '';
-                uploadArea.style.borderColor = '';
                 fileInput.click();
             });
             
@@ -212,31 +200,9 @@ class UIManager {
                 }
             });
             
-            // Drag and drop for desktop
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.classList.add('drag-over');
-            });
-            
-            uploadArea.addEventListener('dragleave', () => {
-                uploadArea.classList.remove('drag-over');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.classList.remove('drag-over');
-                const files = e.dataTransfer.files;
-                console.log('📁 Files dropped:', files.length);
-                this.handleImageFiles(files);
-            });
-            
             console.log('✅ Image upload setup complete');
         } else {
-            console.error('❌ Image upload elements not found:', {
-                uploadArea: !!uploadArea,
-                fileInput: !!fileInput,
-                imagePreview: !!imagePreview
-            });
+            console.error('❌ Image upload elements not found');
         }
     }
     
@@ -316,18 +282,44 @@ class UIManager {
         const mobileOverlay = document.querySelector('.mobile-overlay');
         
         if (navMenu && navToggle && mobileOverlay) {
-            // FORCE DISPLAY: FLEX before adding active class
-            navMenu.style.display = 'flex';
+            // Use multiple methods to ensure display
+            navMenu.style.cssText = `
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                left: 0 !important;
+                position: fixed !important;
+                top: 0 !important;
+                width: 280px !important;
+                height: 100vh !important;
+                background: white !important;
+                flex-direction: column !important;
+                padding: 80px 20px 20px !important;
+                box-shadow: 2px 0 20px rgba(0,0,0,0.2) !important;
+                z-index: 1000 !important;
+                overflow-y: auto !important;
+            `;
+            
             navMenu.classList.add('active');
             navToggle.classList.add('active');
             mobileOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            console.log('✅ Mobile menu opened - display forced to flex');
             
-            // Debug: Check current display
-            setTimeout(() => {
-                console.log('📱 Menu display after open:', window.getComputedStyle(navMenu).display);
-            }, 100);
+            console.log('✅ Mobile menu opened with forced styles');
+            
+            // Double check after a frame
+            requestAnimationFrame(() => {
+                console.log('📱 Final menu display:', window.getComputedStyle(navMenu).display);
+                console.log('📱 Final menu visibility:', window.getComputedStyle(navMenu).visibility);
+                
+                // If still not visible, use nuclear option
+                if (window.getComputedStyle(navMenu).display === 'none') {
+                    console.log('🚨 Using nuclear option - forcing display');
+                    navMenu.style.setProperty('display', 'flex', 'important');
+                    navMenu.style.setProperty('visibility', 'visible', 'important');
+                    navMenu.style.setProperty('opacity', '1', 'important');
+                }
+            });
         } else {
             console.error('❌ Mobile menu elements not found');
         }
