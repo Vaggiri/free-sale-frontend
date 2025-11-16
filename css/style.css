@@ -726,56 +726,7 @@ main {
 .auth-form.active {
     display: block;
 }
-/* Hamburger Menu Icon */
-.nav-toggle {
-    display: none;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 24px;
-    height: 20px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    z-index: 1001;
-}
 
-.nav-toggle .bar {
-    display: block;
-    width: 24px;
-    height: 3px;
-    background-color: var(--dark-color);
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.nav-toggle.active .bar:nth-child(1) {
-    transform: rotate(45deg) translate(6px, 6px);
-}
-
-.nav-toggle.active .bar:nth-child(2) {
-    opacity: 0;
-}
-
-.nav-toggle.active .bar:nth-child(3) {
-    transform: rotate(-45deg) translate(6px, -6px);
-}
-
-/* Mobile overlay */
-.mobile-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-}
-
-.mobile-overlay.active {
-    display: block;
-}
 /* Loading Spinner */
 .spinner {
     display: none;
