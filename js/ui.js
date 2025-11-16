@@ -282,44 +282,12 @@ class UIManager {
         const mobileOverlay = document.querySelector('.mobile-overlay');
         
         if (navMenu && navToggle && mobileOverlay) {
-            // Use multiple methods to ensure display
-            navMenu.style.cssText = `
-                display: flex !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                left: 0 !important;
-                position: fixed !important;
-                top: 0 !important;
-                width: 280px !important;
-                height: 100vh !important;
-                background: white !important;
-                flex-direction: column !important;
-                padding: 80px 20px 20px !important;
-                box-shadow: 2px 0 20px rgba(0,0,0,0.2) !important;
-                z-index: 1000 !important;
-                overflow-y: auto !important;
-            `;
-            
             navMenu.classList.add('active');
             navToggle.classList.add('active');
             mobileOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            console.log('✅ Mobile menu opened with forced styles');
-            
-            // Double check after a frame
-            requestAnimationFrame(() => {
-                console.log('📱 Final menu display:', window.getComputedStyle(navMenu).display);
-                console.log('📱 Final menu visibility:', window.getComputedStyle(navMenu).visibility);
-                
-                // If still not visible, use nuclear option
-                if (window.getComputedStyle(navMenu).display === 'none') {
-                    console.log('🚨 Using nuclear option - forcing display');
-                    navMenu.style.setProperty('display', 'flex', 'important');
-                    navMenu.style.setProperty('visibility', 'visible', 'important');
-                    navMenu.style.setProperty('opacity', '1', 'important');
-                }
-            });
+            console.log('✅ Mobile menu opened');
         } else {
             console.error('❌ Mobile menu elements not found');
         }
@@ -336,13 +304,6 @@ class UIManager {
             navToggle.classList.remove('active');
             mobileOverlay.classList.remove('active');
             document.body.style.overflow = '';
-            
-            // Reset display after transition
-            setTimeout(() => {
-                if (!navMenu.classList.contains('active')) {
-                    navMenu.style.display = 'none';
-                }
-            }, 300);
             
             console.log('✅ Mobile menu closed');
         }
