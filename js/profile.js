@@ -5,21 +5,43 @@ class ProfileManager {
     static async loadUserProfile() {
         if (!authManager.isLoggedIn()) {
             console.log('❌ User not logged in for profile');
+            this.displayDefaultProfile();
             return;
         }
         
         const user = authManager.getCurrentUser();
-        console.log('👤 Loading user profile:', user);
+        console.log('👤 Loading user profile data:', user);
         
         if (user) {
+            // Update profile display with actual user data
             const profileName = document.getElementById('profile-name');
             const profileCollege = document.getElementById('profile-college');
             const profileRating = document.getElementById('profile-rating-value');
             
-            if (profileName) profileName.textContent = user.name;
-            if (profileCollege) profileCollege.textContent = user.college || 'College not set';
-            if (profileRating) profileRating.textContent = user.rating || 'No ratings';
+            if (profileName) {
+                profileName.textContent = user.name || 'User Name';
+                console.log('✅ Set profile name to:', user.name);
+            }
+            if (profileCollege) {
+                profileCollege.textContent = user.college || 'Amrita Vishwa Vidyapeetham';
+            }
+            if (profileRating) {
+                profileRating.textContent = user.rating || 'No ratings';
+            }
+        } else {
+            console.log('❌ No user data available, showing default');
+            this.displayDefaultProfile();
         }
+    }
+    
+    static displayDefaultProfile() {
+        const profileName = document.getElementById('profile-name');
+        const profileCollege = document.getElementById('profile-college');
+        const profileRating = document.getElementById('profile-rating-value');
+        
+        if (profileName) profileName.textContent = 'User Name';
+        if (profileCollege) profileCollege.textContent = 'Amrita Vishwa Vidyapeetham';
+        if (profileRating) profileRating.textContent = 'No ratings';
     }
     
     static async loadUserListings() {
@@ -306,3 +328,4 @@ window.debugProfile = () => {
     ProfileManager.debugAuthStatus();
     ProfileManager.loadUserListings();
 };
+window.ProfileManager = ProfileManager;

@@ -15,9 +15,7 @@ class UIManager {
         this.handleResize();
         window.addEventListener('resize', () => this.handleResize());
         
-        // Initialize mobile overlay if it doesn't exist
         this.ensureMobileOverlay();
-        
         console.log('✅ UIManager initialized successfully');
     }
     
@@ -68,12 +66,14 @@ class UIManager {
         const navMenu = document.querySelector('.nav-menu');
         const mobileOverlay = document.querySelector('.mobile-overlay');
 
-        // Hamburger menu toggle
+        // Hamburger menu toggle - FIXED
         if (navToggle) {
+            console.log('🍔 Hamburger element found:', navToggle);
+            
             navToggle.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🍔 Hamburger clicked');
+                console.log('🍔 Hamburger clicked - toggling menu');
                 this.toggleMobileMenu();
             });
             
@@ -85,6 +85,8 @@ class UIManager {
             navToggle.addEventListener('touchend', () => {
                 navToggle.style.transform = 'scale(1)';
             });
+        } else {
+            console.error('❌ Hamburger element not found!');
         }
 
         // Mobile overlay click
@@ -104,45 +106,7 @@ class UIManager {
             });
         });
 
-        // Close menu on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isMobileMenuOpen()) {
-                this.closeMobileMenu();
-            }
-        });
-
         console.log('✅ Mobile event listeners setup complete');
-    }
-    
-    setupPageTransitions() {
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.add('fade-in');
-        });
-    }
-    
-    setupModalHandlers() {
-        // Auth modal tabs
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const tab = e.target.getAttribute('data-tab');
-                this.switchAuthTab(tab);
-            });
-        });
-        
-        // Close buttons
-        document.querySelectorAll('.close').forEach(button => {
-            button.addEventListener('click', () => {
-                this.closeAllModals();
-            });
-        });
-        
-        // Profile tabs
-        document.querySelectorAll('.profile-tab').forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const tabName = e.target.getAttribute('data-tab');
-                this.switchProfileTab(tabName);
-            });
-        });
     }
     
     setupImageUpload() {
@@ -154,46 +118,57 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // Make upload area touch-friendly
-            uploadArea.style.cursor = 'pointer';
-            uploadArea.style.minHeight = '150px';
-            uploadArea.style.display = 'flex';
-            uploadArea.style.flexDirection = 'column';
-            uploadArea.style.alignItems = 'center';
-            uploadArea.style.justifyContent = 'center';
+            // Reset file input attributes for mobile
+            fileInput.setAttribute('accept', 'image/*');
+            fileInput.setAttribute('multiple', 'true');
+            fileInput.style.display = 'block';
+            fileInput.style.position = 'absolute';
+            fileInput.style.width = '100%';
+            fileInput.style.height = '100%';
+            fileInput.style.top = '0';
+            fileInput.style.left = '0';
+            fileInput.style.opacity = '0';
+            fileInput.style.cursor = 'pointer';
+            fileInput.style.zIndex = '10';
+            
+            // Make upload area position relative
+            uploadArea.style.position = 'relative';
+            uploadArea.style.overflow = 'hidden';
+            
+            // Enhanced click/touch handling
+            const triggerFileInput = () => {
+                console.log('📱 Triggering file input');
+                fileInput.click();
+            };
             
             // Click handler
-            uploadArea.addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('📱 Upload area clicked');
-                fileInput.click();
-            });
+            uploadArea.addEventListener('click', triggerFileInput);
             
-            // Enhanced touch events for mobile
+            // Touch events for mobile
             uploadArea.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 console.log('📱 Touch start on upload area');
-                uploadArea.classList.add('drag-over');
                 uploadArea.style.backgroundColor = '#f0f8ff';
-            });
-            
-            uploadArea.addEventListener('touchmove', (e) => {
-                e.preventDefault();
+                uploadArea.style.borderColor = '#4361ee';
             });
             
             uploadArea.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 console.log('📱 Touch end on upload area');
-                uploadArea.classList.remove('drag-over');
                 uploadArea.style.backgroundColor = '';
-                
-                // Trigger file input click
-                setTimeout(() => {
-                    fileInput.click();
-                }, 100);
+                uploadArea.style.borderColor = '';
+                triggerFileInput();
             });
             
-            // Desktop drag and drop
+            // File input change - FIXED
+            fileInput.addEventListener('change', (e) => {
+                console.log('📁 File input changed, files:', e.target.files.length);
+                if (e.target.files.length > 0) {
+                    this.handleImageFiles(e.target.files);
+                }
+            });
+            
+            // Drag and drop for desktop
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('drag-over');
@@ -211,23 +186,13 @@ class UIManager {
                 this.handleImageFiles(files);
             });
             
-            // File input change
-            fileInput.addEventListener('change', (e) => {
-                console.log('📁 File input changed:', e.target.files.length);
-                this.handleImageFiles(e.target.files);
-                
-                // Reset the input to allow selecting same file again
-                fileInput.value = '';
-            });
-            
-            // Prevent default behavior
-            fileInput.addEventListener('click', (e) => {
-                e.stopPropagation();
-            });
-            
             console.log('✅ Image upload setup complete');
         } else {
-            console.error('❌ Image upload elements not found');
+            console.error('❌ Image upload elements not found:', {
+                uploadArea: !!uploadArea,
+                fileInput: !!fileInput,
+                imagePreview: !!imagePreview
+            });
         }
     }
     
@@ -239,28 +204,30 @@ class UIManager {
             return;
         }
         
-        // Clear existing previews if needed
-        // imagePreview.innerHTML = '';
+        // Clear existing previews
+        imagePreview.innerHTML = '';
         
-        Array.from(files).forEach(file => {
+        Array.from(files).forEach((file, index) => {
             if (!file.type.startsWith('image/')) {
                 console.log('❌ Skipping non-image file:', file.type);
                 return;
             }
             
-            console.log('✅ Processing image file:', file.name, file.type, file.size);
+            console.log(`✅ Processing image ${index + 1}:`, file.name, file.type);
             
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewDiv = document.createElement('div');
                 previewDiv.className = 'preview-image';
                 previewDiv.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
-                    <span class="remove-image" style="position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer;">×</span>
+                    <img src="${e.target.result}" alt="Preview">
+                    <button class="remove-image" type="button">×</button>
                 `;
                 
                 // Remove image on click
-                previewDiv.querySelector('.remove-image').addEventListener('click', (e) => {
+                const removeBtn = previewDiv.querySelector('.remove-image');
+                removeBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     previewDiv.remove();
                     console.log('🗑️ Image removed from preview');
@@ -276,6 +243,11 @@ class UIManager {
             
             reader.readAsDataURL(file);
         });
+        
+        // Show success message
+        if (files.length > 0) {
+            this.showMessage(`✅ ${files.length} image(s) selected`, 'success');
+        }
     }
     
     // MOBILE MENU METHODS
@@ -306,7 +278,11 @@ class UIManager {
             document.body.style.overflow = 'hidden';
             console.log('✅ Mobile menu opened');
         } else {
-            console.error('❌ Mobile menu elements not found');
+            console.error('❌ Mobile menu elements not found:', {
+                navMenu: !!navMenu,
+                navToggle: !!navToggle,
+                mobileOverlay: !!mobileOverlay
+            });
         }
     }
     
@@ -371,10 +347,10 @@ class UIManager {
                 break;
             case 'profile':
                 if (authManager && authManager.isLoggedIn()) {
-                    if (window.ProfileManager && typeof window.ProfileManager.loadUserProfile === 'function') {
+                    // Force reload profile data
+                    if (window.ProfileManager) {
+                        console.log('👤 Loading user profile data...');
                         window.ProfileManager.loadUserProfile();
-                    }
-                    if (window.ProfileManager && typeof window.ProfileManager.loadUserListings === 'function') {
                         window.ProfileManager.loadUserListings();
                     }
                 } else {
@@ -646,8 +622,6 @@ class UIManager {
         }, 5000);
     }
 }
-
-// Initialize UI Manager
 const uiManager = new UIManager();
 window.uiManager = uiManager;
 console.log('🌐 UIManager added to window');
