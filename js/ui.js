@@ -149,8 +149,6 @@ class UIManager {
     
     setupImageUpload() {
         console.log('🖼️ Setting up image upload...');
-        
-        // Setup for sell form
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('product-images');
         const imagePreview = document.getElementById('image-preview');
@@ -158,9 +156,17 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // Your existing sell form setup code...
-            fileInput.setAttribute('accept', 'image/*');
-            fileInput.setAttribute('multiple', 'true');
+            // Reset any existing styles and setup
+            uploadArea.innerHTML = `
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to upload or drag and drop</p>
+                <span>PNG, JPG, JPEG up to 5MB</span>
+            `;
+            
+            // Make sure file input is properly placed inside upload area
+            uploadArea.appendChild(fileInput);
+            
+            // Style the file input properly
             fileInput.style.cssText = `
                 position: absolute !important;
                 top: 0 !important;
@@ -170,47 +176,92 @@ class UIManager {
                 opacity: 0 !important;
                 cursor: pointer !important;
                 z-index: 10 !important;
-                font-size: 100px !important;
             `;
             
-            uploadArea.style.position = 'relative';
-            uploadArea.style.overflow = 'hidden';
-            uploadArea.style.cursor = 'pointer';
+            // Style upload area
+            uploadArea.style.cssText = `
+                position: relative !important;
+                border: 2px dashed #e9ecef !important;
+                border-radius: 8px !important;
+                padding: 2rem !important;
+                text-align: center !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                min-height: 150px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                background: #f8f9fa !important;
+            `;
             
+            console.log('📱 File input setup complete');
+            
+            // Add hover effects
+            uploadArea.addEventListener('mouseenter', () => {
+                uploadArea.style.borderColor = '#4361ee';
+                uploadArea.style.background = '#f0f8ff';
+            });
+            
+            uploadArea.addEventListener('mouseleave', () => {
+                uploadArea.style.borderColor = '#e9ecef';
+                uploadArea.style.background = '#f8f9fa';
+            });
+            
+            // Click handler
             uploadArea.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 console.log('📱 Upload area clicked');
                 fileInput.click();
             });
             
+            // File input change handler
             fileInput.addEventListener('change', (e) => {
                 console.log('📁 File input changed, files:', e.target.files.length);
                 if (e.target.files.length > 0) {
                     this.handleImageFiles(e.target.files);
-                    fileInput.value = '';
                 }
             });
+            
+            // Drag and drop support
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#4361ee';
+                uploadArea.style.background = '#f0f8ff';
+            });
+            
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#e9ecef';
+                uploadArea.style.background = '#f8f9fa';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#e9ecef';
+                uploadArea.style.background = '#f8f9fa';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    const event = new Event('change', { bubbles: true });
+                    fileInput.dispatchEvent(event);
+                }
+            });
+            
+            console.log('✅ Image upload setup complete');
+        } else {
+            console.error('❌ Image upload elements not found:', {
+                uploadArea: !!uploadArea,
+                fileInput: !!fileInput,
+                imagePreview: !!imagePreview
+            });
         }
-        
-        // ADD THIS: Setup for any other file inputs in the app
-        this.setupGenericFileInputs();
     }
     
-    // ADD THIS NEW METHOD
-    setupGenericFileInputs() {
-        // Setup for any file inputs that might be added dynamically
-        document.addEventListener('change', (e) => {
-            if (e.target.type === 'file' && e.target.matches('#find-file-input, .generic-file-input')) {
-                this.handleImageFiles(e.target.files);
-            }
-        });
-    }
-    
-    handleImageFiles(files, customPreviewContainer = null) {
+    handleImageFiles(files) {
         console.log('🖼️ Handling image files:', files.length);
-        
-        // Use custom container if provided, otherwise default to sell form preview
-        const imagePreview = customPreviewContainer || document.getElementById('image-preview');
+        const imagePreview = document.getElementById('image-preview');
         
         if (!imagePreview) {
             console.error('❌ Image preview container not found');
@@ -218,14 +269,17 @@ class UIManager {
             return;
         }
         
-        // Clear existing previews only if it's the sell form (you might want to keep this configurable)
-        if (!customPreviewContainer) {
-            imagePreview.innerHTML = '';
+        // Clear existing previews
+        imagePreview.innerHTML = '';
+        
+        let processedFiles = 0;
+        const maxFiles = 5; // Limit to 5 images
+        
+        if (files.length > maxFiles) {
+            this.showMessage(`Maximum ${maxFiles} images allowed. Only the first ${maxFiles} will be used.`, 'warning');
         }
         
-        let validFiles = 0;
-        
-        Array.from(files).forEach((file, index) => {
+        Array.from(files).slice(0, maxFiles).forEach((file, index) => {
             if (!file.type.startsWith('image/')) {
                 console.log('❌ Skipping non-image file:', file.type);
                 this.showMessage(`Skipped non-image file: ${file.name}`, 'warning');
@@ -240,27 +294,45 @@ class UIManager {
             }
             
             console.log(`✅ Processing image ${index + 1}:`, file.name, file.type);
-            validFiles++;
             
             const reader = new FileReader();
             reader.onload = (e) => {
+                processedFiles++;
+                
                 const previewDiv = document.createElement('div');
                 previewDiv.className = 'preview-image';
-                previewDiv.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
-                    <button class="remove-image" type="button" data-filename="${file.name}">×</button>
+                previewDiv.style.cssText = `
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    position: relative;
+                    border: 2px solid #e9ecef;
                 `;
                 
+                previewDiv.innerHTML = `
+                    <img src="${e.target.result}" 
+                         alt="Preview" 
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                    <button class="remove-image" 
+                            type="button"
+                            style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        ×
+                    </button>
+                `;
+                
+                // Remove image on click
                 const removeBtn = previewDiv.querySelector('.remove-image');
                 removeBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     previewDiv.remove();
-                    console.log('🗑️ Image removed from preview:', file.name);
-                    this.showMessage(`Removed: ${file.name}`, 'info');
+                    console.log('🗑️ Image removed from preview');
+                    this.updateImageCounter();
                 });
                 
                 imagePreview.appendChild(previewDiv);
+                this.updateImageCounter();
                 console.log('✅ Image preview added');
             };
             
@@ -272,14 +344,30 @@ class UIManager {
             reader.readAsDataURL(file);
         });
         
-        // Show success message
-        if (validFiles > 0) {
-            this.showMessage(`✅ ${validFiles} image(s) selected successfully`, 'success');
-        } else {
-            this.showMessage('No valid images selected', 'warning');
-        }
+        // Show success message after a short delay to allow processing
+        setTimeout(() => {
+            if (processedFiles > 0) {
+                this.showMessage(`✅ ${processedFiles} image(s) selected successfully`, 'success');
+            }
+        }, 500);
+    }
+    
+    // ADD THIS HELPER METHOD
+    updateImageCounter() {
+        const imagePreview = document.getElementById('image-preview');
+        const previewImages = imagePreview.querySelectorAll('.preview-image');
+        const uploadArea = document.getElementById('upload-area');
         
-        return validFiles > 0;
+        if (uploadArea) {
+            const originalText = uploadArea.querySelector('p');
+            if (originalText) {
+                if (previewImages.length > 0) {
+                    originalText.textContent = `${previewImages.length} image(s) selected. Click to add more.`;
+                } else {
+                    originalText.textContent = 'Click to upload or drag and drop';
+                }
+            }
+        }
     }
     
     // MOBILE MENU METHODS

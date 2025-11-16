@@ -213,10 +213,10 @@
                                         <i class="fas fa-cloud-upload-alt"></i>
                                         <p>Click to upload or drag and drop</p>
                                         <span>PNG, JPG, JPEG up to 5MB</span>
-                                        <!-- FILE INPUT MUST BE INSIDE UPLOAD AREA -->
+                                        <!-- FILE INPUT MUST BE HERE -->
                                         <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
                                     </div>
-                                    <div class="image-preview" id="image-preview"></div>
+                                    <div class="image-preview" id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;"></div>
                                 </div>
                             </div>
                         
@@ -287,9 +287,6 @@
 
         <section id="profile-page" class="page">
             <div class="page-header">
-                <button class="back-button">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
                 <div>
                     <h1>My Profile</h1>
                     <p>Manage your account and listings</p>

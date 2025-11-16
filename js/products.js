@@ -312,6 +312,15 @@ class ProductManager {
         const condition = 'good';
         
         const imageFiles = document.getElementById('product-images').files;
+        console.log('📝 Form data:', {
+            title, description, price, category, meetupLocation, condition,
+            imageCount: imageFiles.length
+        });
+        
+        // Debug: Log all files
+        for (let i = 0; i < imageFiles.length; i++) {
+            console.log(`📁 File ${i + 1}:`, imageFiles[i].name, imageFiles[i].size, imageFiles[i].type);
+        }
         
         if (!title || !description || !price || !category || !meetupLocation) {
             if (window.uiManager) {
@@ -462,6 +471,7 @@ class ProductManager {
         };
         return categoryMap[category] || category;
     }
+    
     
     generateStarRating(rating) {
         if (!rating || rating === 0) {
