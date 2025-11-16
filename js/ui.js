@@ -353,6 +353,8 @@ class UIManager {
     }
     
     // ADD THIS HELPER METHOD
+
+    
     updateImageCounter() {
         const imagePreview = document.getElementById('image-preview');
         const previewImages = imagePreview.querySelectorAll('.preview-image');

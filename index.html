@@ -209,14 +209,20 @@
                             <div class="form-group">
                                 <label for="product-images">Upload Images</label>
                                 <div class="image-upload">
-                                    <div class="upload-area" id="upload-area">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p>Click to upload or drag and drop</p>
-                                        <span>PNG, JPG, JPEG up to 5MB</span>
-                                        <!-- FILE INPUT MUST BE HERE -->
-                                        <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
-                                    </div>
+                                    <!-- SIMPLE FILE INPUT APPROACH -->
+                                    <input type="file" 
+                                           id="product-images" 
+                                           name="images" 
+                                           multiple 
+                                           accept="image/*"
+                                           style="width: 100%; padding: 1rem; border: 2px dashed #e9ecef; border-radius: 8px; background: #f8f9fa; cursor: pointer;"
+                                           onchange="uiManager.handleImageFiles(this.files)">
+                                    
                                     <div class="image-preview" id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;"></div>
+                                    
+                                    <p style="text-align: center; color: #6c757d; font-size: 0.9rem; margin-top: 0.5rem;">
+                                        <i class="fas fa-info-circle"></i> Select multiple images (PNG, JPG, JPEG up to 5MB each)
+                                    </p>
                                 </div>
                             </div>
                         
