@@ -69,7 +69,9 @@ class ProductManager {
     async testConnection() {
         try {
             console.log('🔧 Testing API connection...');
-            const response = await fetch(`${this.API_BASE}/cors-test`, {
+            
+            // Test health endpoint instead of cors-test
+            const response = await fetch(`${this.API_BASE}/health`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,7 +81,7 @@ class ProductManager {
             
             if (response.ok) {
                 const data = await response.json();
-                console.log('✅ API connection test passed:', data.message);
+                console.log('✅ API connection test passed:', data.status);
                 return true;
             } else {
                 console.warn('⚠️ API connection test failed with status:', response.status);
@@ -466,18 +468,18 @@ class ProductManager {
     getImageUrl(imagePath) {
         if (!imagePath) return '';
         
+        // If it's already a full URL (like Unsplash images)
         if (imagePath.startsWith('http')) {
             return imagePath;
         }
         
+        // If it's a base64 image
         if (imagePath.startsWith('data:image')) {
             return imagePath;
         }
         
-        // For local files, use the API base URL
-        // Remove any leading slashes to avoid double slashes in URL
-        const cleanPath = imagePath.replace(/^\//, '');
-        return `${this.API_BASE}/uploads/${cleanPath}`;
+        // If it's a filename from uploads - use UPLOADS_BASE (not API_BASE + /uploads)
+        return `${Config.UPLOADS_BASE}/${imagePath}`;
     }
     
     escapeHtml(text) {
