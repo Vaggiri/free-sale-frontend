@@ -466,18 +466,16 @@ class ProductManager {
     getImageUrl(imagePath) {
         if (!imagePath) return '';
         
-        // If it's already a full URL (like Unsplash images)
         if (imagePath.startsWith('http')) {
             return imagePath;
         }
         
-        // If it's a base64 image
         if (imagePath.startsWith('data:image')) {
             return imagePath;
         }
         
-        // If it's a filename from uploads
-        return `http://localhost:5000/uploads/${imagePath}`;
+        // Use the config for uploads URL
+        return `${Config.UPLOADS_BASE}/${imagePath}`;
     }
     
     escapeHtml(text) {
