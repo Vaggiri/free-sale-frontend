@@ -210,12 +210,15 @@
                             <div class="form-group">
                                 <label for="product-images">Upload Images</label>
                                 <div class="image-upload">
-                                    <div class="upload-area" id="upload-area" onclick="triggerFileInput()">
+                                    <div class="upload-area" id="upload-area">
                                         <i class="fas fa-cloud-upload-alt"></i>
-                                        <p>Click to upload or drag and drop</p>
+                                        <p id="upload-text">Click to upload or drag and drop</p>
                                         <span>PNG, JPG, JPEG up to 5MB</span>
-                                        <!-- File input MUST be here -->
                                         <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
+                                        <!-- Mobile fallback button -->
+                                        <button type="button" id="mobile-upload-button" style="display: none; margin-top: 10px; padding: 10px 15px; background: #4361ee; color: white; border: none; border-radius: 5px; font-size: 14px;">
+                                            <i class="fas fa-camera"></i> Choose Photos
+                                        </button>
                                     </div>
                                     <div class="image-preview" id="image-preview" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;"></div>
                                 </div>

@@ -117,6 +117,12 @@ class UIManager {
 
         console.log('✅ Mobile event listeners setup complete');
     }
+    // Add this method to your UIManager class
+    isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            || window.innerWidth <= 768
+            || 'ontouchstart' in window;
+        }
     
     setupModalHandlers() {
         console.log('🎪 Setting up modal handlers...');
@@ -152,40 +158,62 @@ class UIManager {
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('product-images');
         const imagePreview = document.getElementById('image-preview');
+        const mobileUploadButton = document.getElementById('mobile-upload-button');
+        const uploadText = document.getElementById('upload-text');
         
         if (uploadArea && fileInput && imagePreview) {
-            console.log('✅ Image upload elements found');
+            console.log('📱 Device type:', this.isMobile() ? 'Mobile' : 'Desktop');
+            
+            // Show mobile-specific UI
+            if (this.isMobile()) {
+                if (mobileUploadButton) {
+                    mobileUploadButton.style.display = 'block';
+                }
+                if (uploadText) {
+                    uploadText.textContent = 'Tap below to choose photos';
+                }
+                console.log('📱 Mobile upload interface activated');
+            }
             
             // Reset upload area content
             uploadArea.innerHTML = `
                 <i class="fas fa-cloud-upload-alt"></i>
-                <p>Click to upload or drag and drop</p>
+                <p id="upload-text">${this.isMobile() ? 'Tap below to choose photos' : 'Click to upload or drag and drop'}</p>
                 <span>PNG, JPG, JPEG up to 5MB</span>
                 <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
+                <button type="button" id="mobile-upload-button" style="${this.isMobile() ? 'display: block;' : 'display: none;'} margin-top: 10px; padding: 10px 15px; background: #4361ee; color: white; border: none; border-radius: 5px; font-size: 14px;">
+                    <i class="fas fa-camera"></i> Choose Photos
+                </button>
             `;
             
-            // Get the newly created file input
-            const newFileInput = uploadArea.querySelector('#product-images');
+            // Get fresh references after innerHTML
+            const freshFileInput = uploadArea.querySelector('#product-images');
+            const freshMobileButton = uploadArea.querySelector('#mobile-upload-button');
             
-            // Style upload area
+            // Enhanced mobile detection
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            console.log('📱 Touch device:', isTouchDevice);
+            
+            // Style upload area for mobile
             uploadArea.style.cssText = `
                 position: relative !important;
                 border: 2px dashed #e9ecef !important;
                 border-radius: 8px !important;
-                padding: 2rem !important;
+                padding: ${this.isMobile() ? '1.5rem' : '2rem'} !important;
                 text-align: center !important;
                 cursor: pointer !important;
                 transition: all 0.3s ease !important;
-                min-height: 150px !important;
+                min-height: ${this.isMobile() ? '120px' : '150px'} !important;
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 justify-content: center !important;
                 background: #f8f9fa !important;
+                -webkit-tap-highlight-color: transparent !important;
             `;
             
             // Style file input
-            newFileInput.style.cssText = `
+            freshFileInput.style.cssText = `
                 position: absolute !important;
                 top: 0 !important;
                 left: 0 !important;
@@ -194,91 +222,93 @@ class UIManager {
                 opacity: 0 !important;
                 cursor: pointer !important;
                 z-index: 10 !important;
+                font-size: 16px !important; /* Prevent zoom on iOS */
             `;
             
-            console.log('📱 File input setup complete');
+            // MOBILE-SPECIFIC FIXES:
             
-            // Add hover effects
-            uploadArea.addEventListener('mouseenter', () => {
-                uploadArea.style.borderColor = '#4361ee';
-                uploadArea.style.background = '#f0f8ff';
-            });
-            
-            uploadArea.addEventListener('mouseleave', () => {
-                uploadArea.style.borderColor = '#e9ecef';
-                uploadArea.style.background = '#f8f9fa';
-            });
-            
-            // Click handler - using event delegation
-            uploadArea.addEventListener('click', (e) => {
-                // Only trigger if clicking on the upload area itself, not on remove buttons
-                if (e.target === uploadArea || 
-                    e.target.tagName === 'I' || 
-                    e.target.tagName === 'P' || 
-                    e.target.tagName === 'SPAN') {
+            // 1. Mobile button click handler
+            if (freshMobileButton) {
+                freshMobileButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('📱 Upload area clicked');
-                    newFileInput.click();
-                }
-            });
-            
-            // File input change handler
-            newFileInput.addEventListener('change', (e) => {
-                console.log('📁 File input changed, files:', e.target.files.length);
-                if (e.target.files.length > 0) {
-                    this.handleImageFiles(e.target.files);
-                }
-            });
-            
-            // Drag and drop support
-            uploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#4361ee';
-                uploadArea.style.background = '#f0f8ff';
-                uploadArea.classList.add('dragover');
-            });
-            
-            uploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#e9ecef';
-                uploadArea.style.background = '#f8f9fa';
-                uploadArea.classList.remove('dragover');
-            });
-            
-            uploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#e9ecef';
-                uploadArea.style.background = '#f8f9fa';
-                uploadArea.classList.remove('dragover');
+                    console.log('📱 Mobile upload button clicked');
+                    freshFileInput.click();
+                });
                 
-                if (e.dataTransfer.files.length > 0) {
-                    console.log('📁 Files dropped:', e.dataTransfer.files.length);
-                    // Create a new DataTransfer to set files
-                    const dt = new DataTransfer();
-                    for (let file of e.dataTransfer.files) {
-                        dt.items.add(file);
-                    }
-                    newFileInput.files = dt.files;
-                    
-                    // Trigger change event
-                    const event = new Event('change', { bubbles: true });
-                    newFileInput.dispatchEvent(event);
+                // Add touch feedback
+                freshMobileButton.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                    this.style.opacity = '0.8';
+                });
+                
+                freshMobileButton.addEventListener('touchend', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.opacity = '1';
+                });
+            }
+            
+            // 2. Enhanced click/touch handler for upload area
+            const handleUploadClick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('📱 Upload area triggered');
+                
+                // Force file input click with timeout for mobile
+                setTimeout(() => {
+                    freshFileInput.click();
+                }, 100);
+            };
+            
+            // Use both click and touch events for mobile
+            if (isTouchDevice) {
+                uploadArea.addEventListener('touchstart', handleUploadClick, { passive: false });
+                uploadArea.addEventListener('touchend', (e) => e.preventDefault());
+            } else {
+                uploadArea.addEventListener('click', handleUploadClick);
+            }
+            
+            // 3. Enhanced file input change handler
+            const handleFileChange = (e) => {
+                console.log('📁 File input changed on:', this.isMobile() ? 'Mobile' : 'Desktop');
+                console.log('📁 Files:', e.target.files);
+                
+                if (e.target.files && e.target.files.length > 0) {
+                    console.log('📁 Processing files:', e.target.files.length);
+                    this.handleImageFiles(e.target.files);
+                } else {
+                    console.warn('⚠️ No files selected or files array empty');
                 }
+            };
+            
+            freshFileInput.addEventListener('change', handleFileChange);
+            
+            // 4. Mobile-specific event for camera capture
+            freshFileInput.setAttribute('capture', 'environment'); // Rear camera
+            freshFileInput.setAttribute('accept', 'image/*');
+            
+            // 5. Add visual feedback for mobile
+            uploadArea.addEventListener('touchstart', function() {
+                this.style.backgroundColor = '#e3f2fd';
+                this.style.borderColor = '#2196f3';
             });
             
-            console.log('✅ Image upload setup complete');
-        } else {
-            console.error('❌ Image upload elements not found:', {
-                uploadArea: !!uploadArea,
-                fileInput: !!fileInput,
-                imagePreview: !!imagePreview
+            uploadArea.addEventListener('touchend', function() {
+                this.style.backgroundColor = '#f8f9fa';
+                this.style.borderColor = '#e9ecef';
             });
+            
+            console.log('✅ Mobile image upload setup complete');
+            
+        } else {
+            console.error('❌ Image upload elements not found');
         }
     }
     
     handleImageFiles(files) {
-        console.log('🖼️ Handling image files:', files.length);
+        console.log('🖼️ Handling image files on:', this.isMobile() ? 'Mobile' : 'Desktop');
+        console.log('📁 Files received:', files.length);
+        
         const imagePreview = document.getElementById('image-preview');
         const fileInput = document.getElementById('product-images');
         
@@ -288,96 +318,124 @@ class UIManager {
             return;
         }
         
-        // Store current files
-        const currentFiles = fileInput.files ? Array.from(fileInput.files) : [];
-        
-        let processedFiles = 0;
-        const maxFiles = 5; // Limit to 5 images
-        
-        if (files.length > maxFiles) {
-            this.showMessage(`Maximum ${maxFiles} images allowed. Only the first ${maxFiles} will be used.`, 'warning');
+        if (!files || files.length === 0) {
+            console.warn('⚠️ No files to process');
+            this.showMessage('No images selected', 'warning');
+            return;
         }
         
-        const validFiles = [];
+        // Clear existing previews
+        imagePreview.innerHTML = '';
         
-        Array.from(files).slice(0, maxFiles).forEach((file, index) => {
+        let processedFiles = 0;
+        const maxFiles = 5;
+        
+        if (files.length > maxFiles) {
+            this.showMessage(`Maximum ${maxFiles} images allowed`, 'warning');
+        }
+        
+        // Convert FileList to Array for mobile compatibility
+        const filesArray = Array.from(files).slice(0, maxFiles);
+        
+        console.log('🖼️ Processing files:', filesArray.length);
+        
+        filesArray.forEach((file, index) => {
+            // Enhanced file validation
             if (!file.type.startsWith('image/')) {
-                console.log('❌ Skipping non-image file:', file.type);
-                this.showMessage(`Skipped non-image file: ${file.name}`, 'warning');
+                console.log('❌ Skipping non-image file:', file.type, file.name);
+                this.showMessage(`Skipped non-image: ${file.name}`, 'warning');
                 return;
             }
             
-            // Check file size (5MB limit)
             if (file.size > 5 * 1024 * 1024) {
                 console.log('❌ File too large:', file.name, file.size);
-                this.showMessage(`File too large (max 5MB): ${file.name}`, 'error');
+                this.showMessage(`Too large: ${file.name}`, 'error');
                 return;
             }
             
-            console.log(`✅ Processing image ${index + 1}:`, file.name, file.type);
-            validFiles.push(file);
+            console.log(`✅ Processing image ${index + 1}:`, file.name, file.type, file.size);
             
             const reader = new FileReader();
+            
             reader.onload = (e) => {
                 processedFiles++;
+                console.log(`✅ Image ${index + 1} loaded successfully`);
                 
-                const previewDiv = document.createElement('div');
-                previewDiv.className = 'preview-image';
-                previewDiv.style.cssText = `
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 8px;
-                    overflow: hidden;
-                    position: relative;
-                    border: 2px solid #e9ecef;
-                `;
-                
-                previewDiv.innerHTML = `
-                    <img src="${e.target.result}" 
-                         alt="Preview" 
-                         style="width: 100%; height: 100%; object-fit: cover;">
-                    <button class="remove-image" 
-                            type="button"
-                            style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                        ×
-                    </button>
-                `;
-                
-                // Remove image on click
-                const removeBtn = previewDiv.querySelector('.remove-image');
-                removeBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    previewDiv.remove();
-                    console.log('🗑️ Image removed from preview');
-                    
-                    // Remove from file input
-                    this.removeFileFromInput(file.name);
-                    this.updateImageCounter();
-                });
-                
-                imagePreview.appendChild(previewDiv);
+                this.createImagePreview(e.target.result, file.name, imagePreview);
                 this.updateImageCounter();
-                console.log('✅ Image preview added');
             };
             
             reader.onerror = (error) => {
-                console.error('❌ Error reading file:', error);
-                this.showMessage(`Error reading file: ${file.name}`, 'error');
+                console.error('❌ Error reading file:', error, file.name);
+                this.showMessage(`Error reading: ${file.name}`, 'error');
             };
             
-            reader.readAsDataURL(file);
+            reader.onabort = () => {
+                console.warn('⚠️ File reading aborted:', file.name);
+            };
+            
+            // Read the file
+            try {
+                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('❌ Failed to read file:', error, file.name);
+                this.showMessage(`Failed to read: ${file.name}`, 'error');
+            }
         });
         
-        // Update file input with all valid files
-        this.updateFileInput(validFiles, currentFiles);
-        
-        // Show success message after a short delay to allow processing
+        // Update success message
         setTimeout(() => {
             if (processedFiles > 0) {
-                this.showMessage(`✅ ${processedFiles} image(s) selected successfully`, 'success');
+                const message = `✅ ${processedFiles} image(s) selected`;
+                console.log(message);
+                this.showMessage(message, 'success');
+            } else {
+                console.warn('⚠️ No files were processed successfully');
+                this.showMessage('No valid images selected', 'warning');
             }
-        }, 500);
+        }, 1000);
+    }
+    
+    // Helper method to create image preview
+    createImagePreview(dataUrl, fileName, container) {
+        const previewDiv = document.createElement('div');
+        previewDiv.className = 'preview-image';
+        previewDiv.style.cssText = `
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #e9ecef;
+            background: white;
+        `;
+        
+        previewDiv.innerHTML = `
+            <img src="${dataUrl}" 
+                 alt="Preview" 
+                 style="width: 100%; height: 100%; object-fit: cover;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+            <div class="image-fallback" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; background: #f8f9fa; color: #6c757d;">
+                <i class="fas fa-image"></i>
+            </div>
+            <button class="remove-image" 
+                    type="button"
+                    style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 11;">
+                ×
+            </button>
+        `;
+        
+        // Remove image functionality
+        const removeBtn = previewDiv.querySelector('.remove-image');
+        removeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            previewDiv.remove();
+            this.removeFileFromInput(fileName);
+            this.updateImageCounter();
+        });
+        
+        container.appendChild(previewDiv);
     }
     
     // Helper method to update file input
