@@ -83,8 +83,8 @@
                 </button>
             </div>
             <div class="nav-toggle">
-                <span class="bar"></span>
-                <span class="bar"></span>
+                <span class="bar" onclick="testMenu();"></span>
+                <span class="bar" onclick="testMenu();"></span>
                 <span class="bar"></span>
             </div>
         </div>
@@ -361,7 +361,24 @@
     <script src="js/profile.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
+<script>
+    function testMenu() {
+    const menu = document.querySelector('.nav-menu');
+    const overlay = document.querySelector('.mobile-overlay');
+    
+    // Remove all inline styles
+    menu.removeAttribute('style');
+    overlay.removeAttribute('style');
+    
+    // Toggle manually
+    menu.classList.toggle('active');
+    overlay.classList.toggle('active');
+    
+    console.log('Menu active:', menu.classList.contains('active'));
+    console.log('Menu display:', window.getComputedStyle(menu).display);
+}
 
+</script>
         
     
 </body>
