@@ -282,24 +282,16 @@ class UIManager {
         const mobileOverlay = document.querySelector('.mobile-overlay');
         
         if (navMenu && navToggle && mobileOverlay) {
+            // Remove any inline styles that might be causing issues
+            navMenu.removeAttribute('style');
+            mobileOverlay.removeAttribute('style');
+            
             navMenu.classList.add('active');
             navToggle.classList.add('active');
             mobileOverlay.classList.add('active');
             document.body.classList.add('menu-open');
             
-            console.log('✅ Mobile menu opened - Classes added');
-            
-            // Debug: Check actual positions
-            setTimeout(() => {
-                const rect = navMenu.getBoundingClientRect();
-                console.log('📐 Menu position:', {
-                    left: rect.left,
-                    top: rect.top,
-                    width: rect.width,
-                    height: rect.height,
-                    visible: rect.width > 0 && rect.height > 0
-                });
-            }, 100);
+            console.log('✅ Mobile menu opened - Using display flex');
         } else {
             console.error('❌ Mobile menu elements not found');
         }
