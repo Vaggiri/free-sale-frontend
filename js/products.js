@@ -474,8 +474,10 @@ class ProductManager {
             return imagePath;
         }
         
-        // Use the config for uploads URL
-        return `${Config.UPLOADS_BASE}/${imagePath}`;
+        // For local files, use the API base URL
+        // Remove any leading slashes to avoid double slashes in URL
+        const cleanPath = imagePath.replace(/^\//, '');
+        return `${this.API_BASE}/uploads/${cleanPath}`;
     }
     
     escapeHtml(text) {
