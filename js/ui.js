@@ -4,12 +4,42 @@ class UIManager {
         this.currentPage = 'home';
         this.init();
     }
+    isMobile() {
+        return window.innerWidth <= 768;
+    }
+    
+    isTablet() {
+        return window.innerWidth > 768 && window.innerWidth <= 1024;
+    }
+    
+    isDesktop() {
+        return window.innerWidth > 1024;
+    }
+    
+    // Handle window resize
+    handleResize() {
+        if (this.isMobile()) {
+            document.body.classList.add('mobile');
+            document.body.classList.remove('tablet', 'desktop');
+        } else if (this.isTablet()) {
+            document.body.classList.add('tablet');
+            document.body.classList.remove('mobile', 'desktop');
+        } else {
+            document.body.classList.add('desktop');
+            document.body.classList.remove('mobile', 'tablet');
+        }
+    }
+    
     
     init() {
         this.setupEventListeners();
         this.setupPageTransitions();
+        this.setupMobileEventListeners();
         this.setupModalHandlers();
         this.setupImageUpload();
+        this.handleResize();
+        window.addEventListener('resize', () => this.handleResize());
+
     }
     
     setupEventListeners() {
@@ -411,6 +441,11 @@ showProductDetail(product) {
     };
 
     content.innerHTML = `
+         <div class="product-detail-mobile-header" style="display: none; padding: 1rem; border-bottom: 1px solid #e9ecef;">
+            <button class="back-button" onclick="uiManager.closeAllModals()" style="background: none; border: none; color: #4361ee; font-size: 1rem; cursor: pointer;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
         <div class="product-detail-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 1rem;">
             <!-- Product Images -->
             <div class="product-detail-images">
@@ -484,6 +519,7 @@ showProductDetail(product) {
                     </button>
                 </div>
             </div>
+            ${this.getProductDetailHTML(product)}
         </div>
     `;
     
@@ -494,7 +530,14 @@ showProductDetail(product) {
             this.contactSeller(product);
         });
     }
-    
+     // Show mobile header on small screens
+     if (window.innerWidth <= 768) {
+        content.querySelector('.product-detail-mobile-header').style.display = 'block';
+        content.querySelector('.product-detail-container').style.gridTemplateColumns = '1fr';
+        content.querySelector('.product-detail-container').style.gap = '1rem';
+        content.querySelector('.product-detail-container').style.padding = '0.5rem';
+    }
+
     modal.classList.add('active');
 }
 
@@ -526,6 +569,147 @@ contactSeller(product) {
     const whatsappUrl = `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`;
     
     window.open(whatsappUrl, '_blank');
+}
+setupMobileEventListeners() {
+    // Hamburger menu toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (navToggle) {
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleMobileMenu();
+        });
+    }
+
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', () => {
+            this.closeMobileMenu();
+        });
+    }
+
+    // Back buttons
+    document.querySelectorAll('.back-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.goBack();
+        });
+    });
+
+    // Close mobile menu when clicking nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            this.closeMobileMenu();
+        });
+    });
+
+    // Handle browser back button
+    window.addEventListener('popstate', () => {
+        this.handleBrowserBack();
+    });
+}
+
+toggleMobileMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const backButton = document.getElementById('back-button');
+
+    if (navMenu && navToggle && mobileOverlay) {
+        const isActive = navMenu.classList.contains('active');
+        
+        if (isActive) {
+            this.closeMobileMenu();
+        } else {
+            this.openMobileMenu();
+        }
+    }
+}
+
+openMobileMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+    const backButton = document.getElementById('back-button');
+
+    if (navMenu && navToggle && mobileOverlay) {
+        navMenu.classList.add('active');
+        navToggle.classList.add('active');
+        mobileOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Show/hide back button in mobile menu based on current page
+        if (backButton) {
+            if (this.currentPage !== 'home') {
+                backButton.style.display = 'flex';
+            } else {
+                backButton.style.display = 'none';
+            }
+        }
+    }
+}
+
+closeMobileMenu() {
+    const navMenu = document.querySelector('.nav-menu');
+    const navToggle = document.querySelector('.nav-toggle');
+    const mobileOverlay = document.getElementById('mobile-overlay');
+
+    if (navMenu && navToggle && mobileOverlay) {
+        navMenu.classList.remove('active');
+        navToggle.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+goBack() {
+    this.closeMobileMenu();
+    
+    // Navigate to previous page or home
+    if (this.currentPage !== 'home') {
+        this.navigateToPage('home');
+    }
+}
+
+handleBrowserBack() {
+    this.closeMobileMenu();
+    // You can add custom back navigation logic here
+}
+
+// Update the navigateToPage method to handle mobile
+navigateToPage(page) {
+    // Close mobile menu when navigating
+    this.closeMobileMenu();
+
+    // Hide current page
+    const currentPageElement = document.getElementById(`${this.currentPage}-page`);
+    if (currentPageElement) {
+        currentPageElement.classList.remove('active');
+    }
+
+    // Show new page
+    const newPageElement = document.getElementById(`${page}-page`);
+    if (newPageElement) {
+        newPageElement.classList.add('active');
+    }
+
+    // Update current page
+    this.currentPage = page;
+
+    // Update navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-page') === page) {
+            link.classList.add('active');
+        }
+    });
+
+    // Update browser history
+    window.history.pushState({ page: page }, '', `#${page}`);
+
+    // Load page-specific content
+    this.loadPageContent(page);
 }
 
 // Star rating generator (add this if not exists)
