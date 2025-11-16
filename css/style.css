@@ -887,3 +887,45 @@ main {
 .product-image img[src*="data:image/svg+xml"] + .placeholder {
     display: block;
 }
+/* Hamburger styles */
+.hamburger {
+    display: none;
+    font-size: 2em;
+    background: transparent;
+    border: none;
+  }
+  @media (max-width: 600px) {
+    .navbar ul {
+      display: none;
+    }
+    .hamburger {
+      display: block;
+    }
+  }
+  
+  /* Cards in Rows, Responsive Cards */
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 1rem;
+  }
+  @media (max-width: 600px) {
+    .card-container {
+      justify-content: center;
+    }
+    .product-card {
+      min-width: 200px;
+      max-width: 90vw;
+      font-size: 1em;
+      margin: 0.5em;
+      padding: 1em;
+    }
+    .back-btn {
+      font-size: 1em;
+      margin: 1em 0;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+  }
