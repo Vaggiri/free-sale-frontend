@@ -1009,3 +1009,173 @@ html, body {
         background-color: var(--primary-color);
     }
 }
+/* Add these fixes to your existing style.css */
+
+/* Floating Cards Fix - Prevent Overlap */
+.hero-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 3rem 0;
+    margin-bottom: 6rem; /* Increased margin */
+    position: relative;
+    z-index: 1;
+}
+
+.floating-cards-container {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    overflow: visible;
+}
+
+.floating-card {
+    position: absolute;
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: var(--transition);
+    z-index: 2;
+}
+
+/* Ensure features section has proper spacing */
+.features-section {
+    padding: 4rem 0 2rem 0;
+    text-align: center;
+    position: relative;
+    z-index: 3;
+}
+
+/* Hamburger Menu Fix - Make it Visible */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0.5rem;
+    z-index: 1001;
+    position: relative;
+}
+
+.nav-toggle .bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--primary-color);
+    margin: 3px 0;
+    transition: var(--transition);
+    border-radius: 2px;
+    display: block;
+}
+
+/* Make hamburger visible on mobile */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex !important;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 4px;
+        padding: 8px;
+    }
+    
+    .nav-toggle .bar {
+        background-color: var(--primary-color);
+        box-shadow: 0 0 2px rgba(0,0,0,0.3);
+    }
+    
+    .nav-toggle.active .bar {
+        background-color: var(--primary-color);
+    }
+    
+    /* Floating cards mobile layout */
+    .floating-cards-container {
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .floating-card {
+        position: relative !important;
+        margin: 0.5rem auto;
+        width: 90%;
+        max-width: 280px;
+    }
+    
+    .card-1, .card-2, .card-3 {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+    }
+}
+
+/* Product Card Click Fix */
+.product-card {
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Image Upload Mobile Fix */
+.upload-area {
+    border: 2px dashed var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.upload-area:active {
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .upload-area {
+        min-height: 120px;
+        padding: 1.5rem;
+    }
+    
+    .upload-area:active {
+        transform: scale(0.98);
+    }
+}
+
+/* Mobile Menu Overlay */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.mobile-overlay.active {
+    display: block;
+}

@@ -297,11 +297,22 @@ class ProductManager {
             `;
         }).join('');
         
-        // Add click events to product cards
+        // Add click events to product cards - FIXED VERSION
+        this.attachProductClickEvents();
+        
+        console.log('✅ Products rendered successfully');
+    }
+    
+    attachProductClickEvents() {
+        const container = document.getElementById('products-container');
+        if (!container) return;
+        
         container.querySelectorAll('.product-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 // Don't trigger if clicking on buttons or links
-                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A') return;
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
+                    return;
+                }
                 
                 const productId = card.getAttribute('data-id');
                 const product = this.products.find(p => (p._id || p.id) === productId);
@@ -311,13 +322,7 @@ class ProductManager {
                 }
             });
         });
-        
-        console.log('✅ Products rendered successfully');
     }
-    
-    // ... (Include all the other methods from the previous products.js version)
-    // Make sure to include: handleSellProduct, applySearch, applyFilters, resetFilters, 
-    // getImageUrl, escapeHtml, formatCategory, generateStarRating, debugProductImages, etc.
     
     async handleSellProduct() {
         if (!authManager.isLoggedIn()) {

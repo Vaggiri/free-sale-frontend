@@ -4,32 +4,6 @@ class UIManager {
         this.currentPage = 'home';
         this.init();
     }
-    isMobile() {
-        return window.innerWidth <= 768;
-    }
-    
-    isTablet() {
-        return window.innerWidth > 768 && window.innerWidth <= 1024;
-    }
-    
-    isDesktop() {
-        return window.innerWidth > 1024;
-    }
-    
-    // Handle window resize
-    handleResize() {
-        if (this.isMobile()) {
-            document.body.classList.add('mobile');
-            document.body.classList.remove('tablet', 'desktop');
-        } else if (this.isTablet()) {
-            document.body.classList.add('tablet');
-            document.body.classList.remove('mobile', 'desktop');
-        } else {
-            document.body.classList.add('desktop');
-            document.body.classList.remove('mobile', 'tablet');
-        }
-    }
-    
     
     init() {
         this.setupEventListeners();
@@ -39,7 +13,6 @@ class UIManager {
         this.setupImageUpload();
         this.handleResize();
         window.addEventListener('resize', () => this.handleResize());
-
     }
     
     setupEventListeners() {
@@ -86,58 +59,6 @@ class UIManager {
                 navToggle.classList.remove('active');
             });
         });
-
-        // Enhanced Mobile Menu Functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const navToggle = document.querySelector('.nav-toggle');
-    const navMenu = document.querySelector('.nav-menu');
-    const mobileOverlay = document.createElement('div');
-    
-    // Create mobile overlay
-    mobileOverlay.className = 'mobile-overlay';
-    document.body.appendChild(mobileOverlay);
-
-    // Toggle mobile menu
-    function toggleMobileMenu() {
-        navMenu.classList.toggle('active');
-        navToggle.classList.toggle('active');
-        mobileOverlay.classList.toggle('active');
-        document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
-    }
-
-    // Event listeners
-    if (navToggle) {
-        navToggle.addEventListener('click', toggleMobileMenu);
-    }
-
-    mobileOverlay.addEventListener('click', toggleMobileMenu);
-
-    // Close menu when clicking on nav links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            if (window.innerWidth <= 767) {
-                toggleMobileMenu();
-            }
-        });
-    });
-
-    // Close menu on escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-            toggleMobileMenu();
-        }
-    });
-
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 767) {
-            navMenu.classList.remove('active');
-            navToggle.classList.remove('active');
-            mobileOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
-});
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
@@ -188,11 +109,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     setupImageUpload() {
+        console.log('🖼️ Setting up image upload...');
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('product-images');
         const imagePreview = document.getElementById('image-preview');
         
         if (uploadArea && fileInput && imagePreview) {
+            console.log('✅ Image upload elements found');
+            
             // Make upload area more touch-friendly
             uploadArea.style.cursor = 'pointer';
             uploadArea.style.minHeight = '120px';
@@ -201,22 +125,28 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadArea.style.alignItems = 'center';
             uploadArea.style.justifyContent = 'center';
             
-            uploadArea.addEventListener('click', () => {
+            // Click handler
+            uploadArea.addEventListener('click', (e) => {
+                console.log('📱 Upload area clicked');
+                e.preventDefault();
                 fileInput.click();
             });
             
-            // Add touch events for mobile
+            // Touch events for mobile
             uploadArea.addEventListener('touchstart', (e) => {
+                console.log('📱 Touch start on upload area');
                 e.preventDefault();
                 uploadArea.style.backgroundColor = '#f0f0f0';
             });
             
             uploadArea.addEventListener('touchend', (e) => {
+                console.log('📱 Touch end on upload area');
                 e.preventDefault();
                 uploadArea.style.backgroundColor = '';
                 fileInput.click();
             });
             
+            // Drag and drop events
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('drag-over');
@@ -230,22 +160,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 uploadArea.classList.remove('drag-over');
                 const files = e.dataTransfer.files;
+                console.log('📁 Files dropped:', files.length);
                 this.handleImageFiles(files);
             });
             
+            // File input change
             fileInput.addEventListener('change', (e) => {
+                console.log('📁 File input changed:', e.target.files.length);
                 this.handleImageFiles(e.target.files);
+            });
+            
+            // Prevent default behavior for file input
+            fileInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        } else {
+            console.error('❌ Image upload elements not found:', {
+                uploadArea: !!uploadArea,
+                fileInput: !!fileInput,
+                imagePreview: !!imagePreview
             });
         }
     }
     
     handleImageFiles(files) {
+        console.log('🖼️ Handling image files:', files.length);
         const imagePreview = document.getElementById('image-preview');
-        if (!imagePreview) return;
+        if (!imagePreview) {
+            console.error('❌ Image preview container not found');
+            return;
+        }
         
         Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) return;
+            if (!file.type.startsWith('image/')) {
+                console.log('❌ Skipping non-image file:', file.type);
+                return;
+            }
             
+            console.log('✅ Processing image file:', file.name);
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewDiv = document.createElement('div');
@@ -255,11 +207,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="remove-image">&times;</span>
                 `;
                 
-                previewDiv.querySelector('.remove-image').addEventListener('click', () => {
+                previewDiv.querySelector('.remove-image').addEventListener('click', (e) => {
+                    e.stopPropagation();
                     previewDiv.remove();
                 });
                 
                 imagePreview.appendChild(previewDiv);
+                console.log('✅ Image preview added');
+            };
+            reader.onerror = (error) => {
+                console.error('❌ Error reading file:', error);
             };
             reader.readAsDataURL(file);
         });
@@ -298,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Load page-specific content
         this.loadPageContent(page);
     }
+    
     loadPageContent(page) {
         console.log(`🔄 Loading page: ${page}`);
         
@@ -381,31 +339,241 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    toggleMobileMenu() {
-        const navMenu = document.querySelector('.nav-menu');
-        if (navMenu) {
-            navMenu.classList.toggle('active');
+    // Product detail modal
+    showProductDetail(product) {
+        console.log('👆 Showing product detail:', product.title);
+        const modal = document.getElementById('product-modal');
+        const content = document.getElementById('product-detail-content');
+        
+        if (!modal || !content) {
+            console.error('❌ Product modal elements not found');
+            return;
         }
         
-        // Animate hamburger icon
-        const bars = document.querySelectorAll('.bar');
-        bars.forEach(bar => bar.classList.toggle('active'));
+        // Format category for display
+        const categoryMap = {
+            'books': 'Books',
+            'electronics': 'Electronics', 
+            'cycles': 'Cycles',
+            'hostel-needs': 'Hostel Needs',
+            'accessories': 'Accessories',
+            'other': 'Other'
+        };
+        
+        // Format location for display
+        const locationMap = {
+            'canteen': 'College Canteen',
+            'library': 'Library Entrance',
+            'main-gate': 'Main Gate',
+            'hostel': 'Hostel Common Area',
+            'other': 'Other Location'
+        };
+
+        content.innerHTML = `
+            <div class="product-detail-mobile-header" style="display: none; padding: 1rem; border-bottom: 1px solid #e9ecef;">
+                <button class="back-button" onclick="uiManager.closeAllModals()" style="background: none; border: none; color: #4361ee; font-size: 1rem; cursor: pointer;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+            <div class="product-detail-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 1rem;">
+                <!-- Product Images -->
+                <div class="product-detail-images">
+                    <div class="main-image" style="background: #f8f9fa; border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1rem;">
+                        ${product.images && product.images.length > 0 ? 
+                            `<img src="${this.getImageUrl(product.images[0])}" alt="${product.title}" 
+                                 style="max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px;"
+                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZThlY2VmIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzljYTNkZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">` : 
+                            `<div style="color: #6c757d; padding: 3rem;">
+                                <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                                <p>No Image Available</p>
+                            </div>`
+                        }
+                    </div>
+                </div>
+                
+                <!-- Product Information -->
+                <div class="product-detail-info">
+                    <h2 style="color: #212529; margin-bottom: 0.5rem; font-size: 1.8rem;">${product.title}</h2>
+                    <p class="product-price" style="font-size: 2rem; font-weight: 700; color: #4361ee; margin-bottom: 1rem;">₹${product.price}</p>
+                    
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <span class="product-category" style="background: #4361ee; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
+                            ${categoryMap[product.category] || product.category}
+                        </span>
+                        <span class="product-status" style="background: #28a745; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
+                            ${product.status || 'Available'}
+                        </span>
+                    </div>
+                    
+                    <div class="product-description" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                        <h3 style="color: #495057; margin-bottom: 0.5rem;">Description</h3>
+                        <p style="color: #6c757d; line-height: 1.6; white-space: pre-wrap;">${product.description}</p>
+                    </div>
+                    
+                    <!-- Seller Information -->
+                    <div class="seller-info" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: #495057; margin-bottom: 1rem;">Seller Information</h3>
+                        <div class="seller-details" style="display: flex; align-items: center; gap: 1rem;">
+                            <div class="seller-avatar" style="width: 50px; height: 50px; background: #4361ee; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-user" style="color: white; font-size: 1.2rem;"></i>
+                            </div>
+                            <div class="seller-text">
+                                <p class="seller-name" style="font-weight: 600; color: #212529; margin-bottom: 0.25rem;">${product.seller?.name || 'Unknown Seller'}</p>
+                                <p class="seller-college" style="color: #6c757d; margin-bottom: 0.5rem;">${product.seller?.college || 'College not specified'}</p>
+                                <div class="seller-rating" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <div class="stars">
+                                        ${this.generateStarRating(product.seller?.rating)}
+                                    </div>
+                                    <span style="color: #6c757d; font-size: 0.9rem;">${product.seller?.rating || 'No ratings yet'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Meetup Information -->
+                    <div class="meetup-info" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: #495057; margin-bottom: 1rem;">Meetup Location</h3>
+                        <p style="color: #6c757d; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-map-marker-alt" style="color: #dc3545;"></i>
+                            ${locationMap[product.meetupLocation] || product.meetupLocation}
+                        </p>
+                    </div>
+                    
+                    <!-- Contact Action -->
+                    <div class="product-actions">
+                        <button class="btn-primary btn-large" id="contact-seller" 
+                                style="width: 100%; padding: 1rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <i class="fab fa-whatsapp" style="font-size: 1.3rem;"></i>
+                            Contact Seller on WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add event listener for contact button
+        const contactButton = document.getElementById('contact-seller');
+        if (contactButton) {
+            contactButton.addEventListener('click', () => {
+                this.contactSeller(product);
+            });
+        }
+        
+        // Show mobile header on small screens
+        if (window.innerWidth <= 768) {
+            content.querySelector('.product-detail-mobile-header').style.display = 'block';
+            content.querySelector('.product-detail-container').style.gridTemplateColumns = '1fr';
+            content.querySelector('.product-detail-container').style.gap = '1rem';
+            content.querySelector('.product-detail-container').style.padding = '0.5rem';
+        }
+
+        modal.classList.add('active');
+    }
+
+    // Add helper method for image URLs
+    getImageUrl(imagePath) {
+        if (!imagePath) return '';
+        if (imagePath.startsWith('http')) {
+            return imagePath;
+        } else if (imagePath.startsWith('/')) {
+            return `https://free-sale-backend.onrender.com${imagePath}`;
+        } else {
+            return `https://free-sale-backend.onrender.com/uploads/${imagePath}`;
+        }
+    }
+
+    // Update contactSeller method to use WhatsApp
+    contactSeller(product) {
+        const user = authManager.getCurrentUser();
+        const sellerPhone = product.seller?.phone || '';
+        const productTitle = encodeURIComponent(product.title);
+        const userName = user ? encodeURIComponent(user.name) : 'Potential Buyer';
+        
+        if (!sellerPhone) {
+            uiManager.showMessage('Seller contact information not available', 'error');
+            return;
+        }
+        
+        const message = `Hi! I'm ${userName} from CampusTrade. I'm interested in your product "${productTitle}" (₹${product.price}). Is it still available?`;
+        const whatsappUrl = `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`;
+        
+        window.open(whatsappUrl, '_blank');
+    }
+
+    generateStarRating(rating) {
+        if (!rating || rating === 0) {
+            return '<span style="color: #6c757d; font-size: 0.9rem;">No ratings</span>';
+        }
+        
+        let stars = '';
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+        
+        for (let i = 0; i < fullStars; i++) {
+            stars += '<i class="fas fa-star" style="color: #ffc107;"></i>';
+        }
+        
+        if (hasHalfStar) {
+            stars += '<i class="fas fa-star-half-alt" style="color: #ffc107;"></i>';
+        }
+        
+        const emptyStars = 5 - Math.ceil(rating);
+        for (let i = 0; i < emptyStars; i++) {
+            stars += '<i class="far fa-star" style="color: #ffc107;"></i>';
+        }
+        
+        return stars;
+    }
+
+    isMobile() {
+        return window.innerWidth <= 768;
     }
     
+    isTablet() {
+        return window.innerWidth > 768 && window.innerWidth <= 1024;
+    }
+    
+    isDesktop() {
+        return window.innerWidth > 1024;
+    }
+    
+    // Handle window resize
+    handleResize() {
+        if (this.isMobile()) {
+            document.body.classList.add('mobile');
+            document.body.classList.remove('tablet', 'desktop');
+        } else if (this.isTablet()) {
+            document.body.classList.add('tablet');
+            document.body.classList.remove('mobile', 'desktop');
+        } else {
+            document.body.classList.add('desktop');
+            document.body.classList.remove('mobile', 'tablet');
+        }
+    }
+
+    toggleMobileMenu() {
+        const navMenu = document.querySelector('.nav-menu');
+        const navToggle = document.querySelector('.nav-toggle');
+        if (navMenu && navToggle) {
+            navMenu.classList.toggle('active');
+            navToggle.classList.toggle('active');
+        }
+    }
+
     showLoading() {
         const spinner = document.getElementById('loading-spinner');
         if (spinner) {
             spinner.classList.add('active');
         }
     }
-    
+
     hideLoading() {
         const spinner = document.getElementById('loading-spinner');
         if (spinner) {
             spinner.classList.remove('active');
         }
     }
-    
+
     showMessage(message, type = 'success') {
         const messageDiv = document.createElement('div');
         messageDiv.className = `${type}-message`;
@@ -432,331 +600,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 5000);
     }
-    
-    // Product detail modal
-    // Add this method to your UIManager class in ui.js
-showProductDetail(product) {
-    const modal = document.getElementById('product-modal');
-    const content = document.getElementById('product-detail-content');
-    
-    if (!modal || !content) return;
-    
-    // Format category for display
-    const categoryMap = {
-        'books': 'Books',
-        'electronics': 'Electronics', 
-        'cycles': 'Cycles',
-        'hostel-needs': 'Hostel Needs',
-        'accessories': 'Accessories',
-        'other': 'Other'
-    };
-    
-    // Format location for display
-    const locationMap = {
-        'canteen': 'College Canteen',
-        'library': 'Library Entrance',
-        'main-gate': 'Main Gate',
-        'hostel': 'Hostel Common Area',
-        'other': 'Other Location'
-    };
-
-    content.innerHTML = `
-         <div class="product-detail-mobile-header" style="display: none; padding: 1rem; border-bottom: 1px solid #e9ecef;">
-            <button class="back-button" onclick="uiManager.closeAllModals()" style="background: none; border: none; color: #4361ee; font-size: 1rem; cursor: pointer;">
-                <i class="fas fa-arrow-left"></i> Back
-            </button>
-        </div>
-        <div class="product-detail-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 1rem;">
-            <!-- Product Images -->
-            <div class="product-detail-images">
-                <div class="main-image" style="background: #f8f9fa; border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1rem;">
-                    ${product.images && product.images.length > 0 ? 
-                        `<img src="${this.getImageUrl(product.images[0])}" alt="${product.title}" 
-                             style="max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px;"
-                             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZThlY2VmIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzljYTNkZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">` : 
-                        `<div style="color: #6c757d; padding: 3rem;">
-                            <i class="fas fa-image" style="font-size: 4rem; margin-bottom: 1rem;"></i>
-                            <p>No Image Available</p>
-                        </div>`
-                    }
-                </div>
-            </div>
-            
-            <!-- Product Information -->
-            <div class="product-detail-info">
-                <h2 style="color: #212529; margin-bottom: 0.5rem; font-size: 1.8rem;">${product.title}</h2>
-                <p class="product-price" style="font-size: 2rem; font-weight: 700; color: #4361ee; margin-bottom: 1rem;">₹${product.price}</p>
-                
-                <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                    <span class="product-category" style="background: #4361ee; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
-                        ${categoryMap[product.category] || product.category}
-                    </span>
-                    <span class="product-status" style="background: #28a745; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
-                        ${product.status || 'Available'}
-                    </span>
-                </div>
-                
-                <div class="product-description" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
-                    <h3 style="color: #495057; margin-bottom: 0.5rem;">Description</h3>
-                    <p style="color: #6c757d; line-height: 1.6; white-space: pre-wrap;">${product.description}</p>
-                </div>
-                
-                <!-- Seller Information -->
-                <div class="seller-info" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: #495057; margin-bottom: 1rem;">Seller Information</h3>
-                    <div class="seller-details" style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="seller-avatar" style="width: 50px; height: 50px; background: #4361ee; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-user" style="color: white; font-size: 1.2rem;"></i>
-                        </div>
-                        <div class="seller-text">
-                            <p class="seller-name" style="font-weight: 600; color: #212529; margin-bottom: 0.25rem;">${product.seller?.name || 'Unknown Seller'}</p>
-                            <p class="seller-college" style="color: #6c757d; margin-bottom: 0.5rem;">${product.seller?.college || 'College not specified'}</p>
-                            <div class="seller-rating" style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div class="stars">
-                                    ${this.generateStarRating(product.seller?.rating)}
-                                </div>
-                                <span style="color: #6c757d; font-size: 0.9rem;">${product.seller?.rating || 'No ratings yet'}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Meetup Information -->
-                <div class="meetup-info" style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h3 style="color: #495057; margin-bottom: 1rem;">Meetup Location</h3>
-                    <p style="color: #6c757d; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-map-marker-alt" style="color: #dc3545;"></i>
-                        ${locationMap[product.meetupLocation] || product.meetupLocation}
-                    </p>
-                </div>
-                
-                <!-- Contact Action -->
-                <div class="product-actions">
-                    <button class="btn-primary btn-large" id="contact-seller" 
-                            style="width: 100%; padding: 1rem; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <i class="fab fa-whatsapp" style="font-size: 1.3rem;"></i>
-                        Contact Seller on WhatsApp
-                    </button>
-                </div>
-            </div>
-            ${this.getProductDetailHTML(product)}
-        </div>
-    `;
-    
-    // Add event listener for contact button
-    const contactButton = document.getElementById('contact-seller');
-    if (contactButton) {
-        contactButton.addEventListener('click', () => {
-            this.contactSeller(product);
-        });
-    }
-     // Show mobile header on small screens
-     if (window.innerWidth <= 768) {
-        content.querySelector('.product-detail-mobile-header').style.display = 'block';
-        content.querySelector('.product-detail-container').style.gridTemplateColumns = '1fr';
-        content.querySelector('.product-detail-container').style.gap = '1rem';
-        content.querySelector('.product-detail-container').style.padding = '0.5rem';
-    }
-
-    modal.classList.add('active');
-}
-
-// Add helper method for image URLs
-getImageUrl(imagePath) {
-    if (!imagePath) return '';
-    if (imagePath.startsWith('http')) {
-        return imagePath;
-    } else if (imagePath.startsWith('/')) {
-        return `https://free-sale-backend.onrender.com${imagePath}`;
-    } else {
-        return `https://free-sale-backend.onrender.com/uploads/${imagePath}`;
-    }
-}
-
-// Update contactSeller method to use WhatsApp
-contactSeller(product) {
-    const user = authManager.getCurrentUser();
-    const sellerPhone = product.seller?.phone || '';
-    const productTitle = encodeURIComponent(product.title);
-    const userName = user ? encodeURIComponent(user.name) : 'Potential Buyer';
-    
-    if (!sellerPhone) {
-        uiManager.showMessage('Seller contact information not available', 'error');
-        return;
-    }
-    
-    const message = `Hi! I'm ${userName} from CampusTrade. I'm interested in your product "${productTitle}" (₹${product.price}). Is it still available?`;
-    const whatsappUrl = `https://wa.me/${sellerPhone}?text=${encodeURIComponent(message)}`;
-    
-    window.open(whatsappUrl, '_blank');
-}
-setupMobileEventListeners() {
-    // Hamburger menu toggle
-    const navToggle = document.querySelector('.nav-toggle');
-    const mobileOverlay = document.getElementById('mobile-overlay');
-    const navMenu = document.querySelector('.nav-menu');
-
-    if (navToggle) {
-        navToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.toggleMobileMenu();
-        });
-    }
-
-    if (mobileOverlay) {
-        mobileOverlay.addEventListener('click', () => {
-            this.closeMobileMenu();
-        });
-    }
-
-    // Back buttons
-    document.querySelectorAll('.back-button').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.goBack();
-        });
-    });
-
-    // Close mobile menu when clicking nav links
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-            this.closeMobileMenu();
-        });
-    });
-
-    // Handle browser back button
-    window.addEventListener('popstate', () => {
-        this.handleBrowserBack();
-    });
-}
-
-toggleMobileMenu() {
-    const navMenu = document.querySelector('.nav-menu');
-    const navToggle = document.querySelector('.nav-toggle');
-    const mobileOverlay = document.getElementById('mobile-overlay');
-    const backButton = document.getElementById('back-button');
-
-    if (navMenu && navToggle && mobileOverlay) {
-        const isActive = navMenu.classList.contains('active');
-        
-        if (isActive) {
-            this.closeMobileMenu();
-        } else {
-            this.openMobileMenu();
-        }
-    }
-}
-
-openMobileMenu() {
-    const navMenu = document.querySelector('.nav-menu');
-    const navToggle = document.querySelector('.nav-toggle');
-    const mobileOverlay = document.getElementById('mobile-overlay');
-    const backButton = document.getElementById('back-button');
-
-    if (navMenu && navToggle && mobileOverlay) {
-        navMenu.classList.add('active');
-        navToggle.classList.add('active');
-        mobileOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-        // Show/hide back button in mobile menu based on current page
-        if (backButton) {
-            if (this.currentPage !== 'home') {
-                backButton.style.display = 'flex';
-            } else {
-                backButton.style.display = 'none';
-            }
-        }
-    }
-}
-
-closeMobileMenu() {
-    const navMenu = document.querySelector('.nav-menu');
-    const navToggle = document.querySelector('.nav-toggle');
-    const mobileOverlay = document.getElementById('mobile-overlay');
-
-    if (navMenu && navToggle && mobileOverlay) {
-        navMenu.classList.remove('active');
-        navToggle.classList.remove('active');
-        mobileOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-}
-
-goBack() {
-    this.closeMobileMenu();
-    
-    // Navigate to previous page or home
-    if (this.currentPage !== 'home') {
-        this.navigateToPage('home');
-    }
-}
-
-handleBrowserBack() {
-    this.closeMobileMenu();
-    // You can add custom back navigation logic here
-}
-
-// Update the navigateToPage method to handle mobile
-navigateToPage(page) {
-    // Close mobile menu when navigating
-    this.closeMobileMenu();
-
-    // Hide current page
-    const currentPageElement = document.getElementById(`${this.currentPage}-page`);
-    if (currentPageElement) {
-        currentPageElement.classList.remove('active');
-    }
-
-    // Show new page
-    const newPageElement = document.getElementById(`${page}-page`);
-    if (newPageElement) {
-        newPageElement.classList.add('active');
-    }
-
-    // Update current page
-    this.currentPage = page;
-
-    // Update navigation
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('data-page') === page) {
-            link.classList.add('active');
-        }
-    });
-
-    // Update browser history
-    window.history.pushState({ page: page }, '', `#${page}`);
-
-    // Load page-specific content
-    this.loadPageContent(page);
-}
-
-// Star rating generator (add this if not exists)
-generateStarRating(rating) {
-    if (!rating || rating === 0) {
-        return '<span style="color: #6c757d; font-size: 0.9rem;">No ratings</span>';
-    }
-    
-    let stars = '';
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    
-    for (let i = 0; i < fullStars; i++) {
-        stars += '<i class="fas fa-star" style="color: #ffc107;"></i>';
-    }
-    
-    if (hasHalfStar) {
-        stars += '<i class="fas fa-star-half-alt" style="color: #ffc107;"></i>';
-    }
-    
-    const emptyStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < emptyStars; i++) {
-        stars += '<i class="far fa-star" style="color: #ffc107;"></i>';
-    }
-    
-    return stars;
-}
 }
 
 // Initialize UI Manager

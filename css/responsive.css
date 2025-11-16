@@ -1119,3 +1119,79 @@
         line-height: 1.4;
     }
 }
+
+/* Add these mobile-specific fixes */
+
+@media (max-width: 768px) {
+    /* Image Upload Mobile Fix */
+    .upload-area {
+        min-height: 120px !important;
+        padding: 1.5rem !important;
+        border: 2px dashed #d1d9e6 !important;
+    }
+    
+    .upload-area i {
+        font-size: 2rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .upload-area p {
+        font-size: 1rem !important;
+        text-align: center;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .upload-area span {
+        font-size: 0.8rem !important;
+    }
+    
+    .image-preview {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .preview-image {
+        width: 80px !important;
+        height: 80px !important;
+        border-radius: 8px;
+    }
+    
+    /* Product Card Click Fix */
+    .product-card {
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .product-card:active {
+        transform: scale(0.98) !important;
+    }
+    
+    /* Hamburger Visibility Fix */
+    .nav-toggle {
+        display: flex !important;
+        background: white !important;
+        border: 1px solid #e9ecef !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+    
+    .nav-toggle .bar {
+        background-color: var(--primary-color) !important;
+    }
+    
+    /* Floating Cards Mobile Layout */
+    .floating-cards-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1rem !important;
+        height: auto !important;
+        margin-top: 2rem !important;
+    }
+    
+    .floating-card {
+        position: relative !important;
+        margin: 0 auto !important;
+        width: 90% !important;
+        max-width: 280px !important;
+        animation: none !important;
+    }
+}
