@@ -96,13 +96,8 @@ class ProfileManager {
     
     static displayUserListings(products) {
         const container = document.getElementById('user-listings');
-        if (!container) {
-            console.error('❌ User listings container not found');
-            return;
-        }
-        
-        console.log('🎨 Displaying user listings:', products);
-        
+        if (!container) return;
+    
         if (!products || products.length === 0) {
             container.innerHTML = `
                 <div class="no-listings" style="text-align: center; padding: 3rem; color: #6c757d; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -116,70 +111,76 @@ class ProfileManager {
             `;
             return;
         }
-        
+    
         container.innerHTML = products.map(product => `
-            <div class="listing-card" data-id="${product._id}" style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid #e9ecef;">
-                <div style="display: flex; gap: 1.5rem; align-items: start;">
+            <div class="listing-card" data-id="${product._id}" style="background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border: 1px solid #f0f0f0;">
+                <div style="display: grid; grid-template-columns: 120px 1fr auto; gap: 1.5rem; align-items: start;">
                     <!-- Product Image -->
-                    <div class="listing-image" style="width: 120px; height: 120px; background: #f8f9fa; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                    <div class="listing-image" style="width: 120px; height: 120px; background: #f8f9fa; border-radius: 8px; overflow: hidden;">
                         ${product.images && product.images.length > 0 ? 
                             `<img src="https://free-sale-backend.onrender.com/uploads/${product.images[0]}" alt="${product.title}" 
                                  style="width: 100%; height: 100%; object-fit: cover;"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                             <div style="display: none; align-items: center; justify-content: center; height: 100%; color: #6c757d; background: #e9ecef;">
+                             <div style="display: none; align-items: center; justify-content: center; height: 100%; color: #6c757d; background: #e9ecef; font-size: 0.8rem; text-align: center; padding: 0.5rem;">
                                  <i class="fas fa-image"></i>
                              </div>` : 
-                            `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6c757d; background: #e9ecef;">
+                            `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6c757d; background: #e9ecef; flex-direction: column; gap: 0.5rem;">
                                 <i class="fas fa-image" style="font-size: 1.5rem;"></i>
+                                <span style="font-size: 0.7rem;">No Image</span>
                             </div>`
                         }
                     </div>
                     
                     <!-- Product Info -->
-                    <div style="flex: 1;">
-                        <h3 style="margin-bottom: 0.5rem; color: #212529; font-size: 1.2rem;">${product.title}</h3>
-                        <p class="listing-price" style="font-size: 1.5rem; font-weight: 700; color: #4361ee; margin-bottom: 0.75rem;">₹${product.price}</p>
+                    <div style="min-width: 0;">
+                        <h3 style="margin: 0 0 0.5rem 0; color: #212529; font-size: 1.2rem; line-height: 1.3; word-wrap: break-word;">${product.title}</h3>
+                        <p style="font-size: 1.5rem; font-weight: 700; color: #4361ee; margin: 0 0 1rem 0;">₹${product.price}</p>
                         
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                            <span class="listing-category" style="background: #e9ecef; color: #6c757d; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">
-                                <i class="fas fa-tag"></i> ${this.formatCategory(product.category)}
+                            <span style="background: #e9ecef; color: #6c757d; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">
+                                ${this.formatCategory(product.category)}
                             </span>
-                            <span class="listing-status ${product.status}" style="background: ${product.status === 'active' ? '#28a745' : '#dc3545'}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">
-                                <i class="fas fa-circle"></i> ${product.status}
+                            <span style="background: ${product.status === 'active' ? '#28a745' : '#dc3545'}; color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">
+                                ${product.status}
                             </span>
                         </div>
                         
-                        <div style="color: #6c757d; font-size: 0.9rem;">
-                            <p style="margin-bottom: 0.25rem;"><i class="fas fa-map-marker-alt"></i> Meet at: ${this.formatLocation(product.meetupLocation)}</p>
-                            <p style="margin-bottom: 0.25rem;"><i class="fas fa-calendar"></i> Listed: ${new Date(product.createdAt).toLocaleDateString()}</p>
+                        <div style="color: #6c757d; font-size: 0.9rem; line-height: 1.4;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <i class="fas fa-map-marker-alt" style="width: 16px;"></i>
+                                <span>${this.formatLocation(product.meetupLocation)}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-calendar" style="width: 16px;"></i>
+                                <span>${new Date(product.createdAt).toLocaleDateString()}</span>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Actions -->
-                    <div class="listing-actions" style="display: flex; gap: 0.5rem; flex-direction: column; min-width: 120px;">
-                        <button class="btn-outline btn-small edit-listing" data-id="${product._id}" 
-                                style="padding: 0.6rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; min-width: 140px;">
+                        <button class="edit-listing" data-id="${product._id}" 
+                                style="padding: 0.6rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; background: #4361ee; color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
                             <i class="fas fa-edit"></i> Edit
                         </button>
                         ${product.status === 'active' ? 
-                            `<button class="btn-outline btn-small mark-sold" data-id="${product._id}" 
-                                    style="padding: 0.6rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; background: #28a745; color: white; border: none;">
+                            `<button class="mark-sold" data-id="${product._id}" 
+                                    style="padding: 0.6rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
                                 <i class="fas fa-check"></i> Mark Sold
                             </button>` : 
-                            `<button class="btn-outline btn-small" style="padding: 0.6rem 1rem; font-size: 0.85rem; background: #6c757d; color: white; border: none; cursor: not-allowed;" disabled>
+                            `<button style="padding: 0.6rem 1rem; font-size: 0.85rem; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: not-allowed;" disabled>
                                 <i class="fas fa-check"></i> Sold
                             </button>`
                         }
-                        <button class="btn-outline btn-small delete-listing" data-id="${product._id}" 
-                                style="padding: 0.6rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; background: #dc3545; color: white; border: none;">
+                        <button class="delete-listing" data-id="${product._id}" 
+                                style="padding: 0.6rem 1rem; font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; justify-content: center; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </div>
                 </div>
             </div>
         `).join('');
-        
-        // Add event listeners
+    
         this.attachListingEventListeners();
     }
     

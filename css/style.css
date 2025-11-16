@@ -857,3 +857,76 @@ main {
 .nav-toggle.active .bar:nth-child(3) {
     transform: rotate(-45deg) translate(7px, -6px);
 }
+/* Profile Listing Cards - Responsive Fix */
+.listing-card {
+    transition: all 0.3s ease;
+}
+
+.listing-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive layout for listing cards */
+@media (max-width: 768px) {
+    .listing-card > div {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    
+    .listing-image {
+        width: 100% !important;
+        height: 200px !important;
+    }
+    
+    .listing-actions {
+        flex-direction: row !important;
+        min-width: 100% !important;
+        justify-content: space-between;
+    }
+    
+    .listing-actions button {
+        flex: 1;
+        min-width: 100px;
+    }
+}
+
+@media (max-width: 576px) {
+    .listing-actions {
+        flex-direction: column !important;
+    }
+    
+    .listing-actions button {
+        width: 100% !important;
+    }
+    
+    .listing-card {
+        padding: 1rem !important;
+    }
+}
+
+/* Button consistency */
+.listing-actions button {
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.listing-actions button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Status badges */
+.listing-status.active {
+    background: #28a745 !important;
+}
+
+.listing-status.sold {
+    background: #dc3545 !important;
+}
+
+.listing-status.pending {
+    background: #ffc107 !important;
+    color: #212529 !important;
+}
