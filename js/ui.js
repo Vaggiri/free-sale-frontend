@@ -316,11 +316,18 @@ class UIManager {
         const mobileOverlay = document.querySelector('.mobile-overlay');
         
         if (navMenu && navToggle && mobileOverlay) {
+            // FORCE DISPLAY: FLEX before adding active class
+            navMenu.style.display = 'flex';
             navMenu.classList.add('active');
             navToggle.classList.add('active');
             mobileOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
-            console.log('✅ Mobile menu opened');
+            console.log('✅ Mobile menu opened - display forced to flex');
+            
+            // Debug: Check current display
+            setTimeout(() => {
+                console.log('📱 Menu display after open:', window.getComputedStyle(navMenu).display);
+            }, 100);
         } else {
             console.error('❌ Mobile menu elements not found');
         }
@@ -337,6 +344,14 @@ class UIManager {
             navToggle.classList.remove('active');
             mobileOverlay.classList.remove('active');
             document.body.style.overflow = '';
+            
+            // Reset display after transition
+            setTimeout(() => {
+                if (!navMenu.classList.contains('active')) {
+                    navMenu.style.display = 'none';
+                }
+            }, 300);
+            
             console.log('✅ Mobile menu closed');
         }
     }

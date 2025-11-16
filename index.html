@@ -396,5 +396,30 @@
             });
         });
         </script>
+        <script>
+            // EMERGENCY FIX FOR MOBILE MENU
+            document.addEventListener('DOMContentLoaded', function() {
+                // Override any CSS that might be hiding the menu
+                const style = document.createElement('style');
+                style.textContent = `
+                    @media (max-width: 768px) {
+                        .nav-menu.active {
+                            display: flex !important;
+                            visibility: visible !important;
+                            opacity: 1 !important;
+                            left: 0 !important;
+                        }
+                        .nav-menu.active * {
+                            display: block !important;
+                            visibility: visible !important;
+                            opacity: 1 !important;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                console.log('🚨 Emergency mobile menu fix applied');
+            });
+            </script>
 </body>
 </html>
