@@ -1241,3 +1241,263 @@ html, body {
 .mobile-overlay.active {
     display: block;
 }
+
+/* Add these fixes to your existing style.css */
+
+/* Hamburger Menu - Make it Visible and Clickable */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    background: white;
+    border: 2px solid var(--primary-color);
+    border-radius: 6px;
+    padding: 8px 6px;
+    z-index: 1001;
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-toggle .bar {
+    width: 24px;
+    height: 3px;
+    background-color: var(--primary-color);
+    margin: 2.5px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+    display: block;
+}
+
+/* Make hamburger visible on mobile */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: flex !important;
+    }
+    
+    .nav-toggle.active .bar:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+        background-color: var(--primary-color);
+    }
+    
+    .nav-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+    }
+    
+    .nav-toggle.active .bar:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+        background-color: var(--primary-color);
+    }
+}
+
+/* Mobile overlay */
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.mobile-overlay.active {
+    display: block;
+}
+
+/* Mobile menu styles */
+@media (max-width: 768px) {
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        background: white;
+        flex-direction: column;
+        padding: 80px 20px 20px;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        transition: left 0.3s ease;
+        z-index: 1000;
+        gap: 0;
+        overflow-y: auto;
+    }
+
+    .nav-menu.active {
+        left: 0;
+    }
+
+    .nav-link {
+        padding: 15px 20px;
+        width: 100%;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+        background: #f8f9fa;
+        color: var(--primary-color);
+    }
+
+    .nav-link::after {
+        display: none;
+    }
+
+    #auth-button {
+        margin: 20px 10px 0;
+        width: calc(100% - 20px);
+        justify-content: center;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 12px;
+    }
+}
+
+/* Image Upload Mobile Improvements */
+.upload-area {
+    border: 2px dashed var(--light-gray);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #fafbfc;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: #f8f9fa;
+}
+
+.upload-area.drag-over {
+    border-color: var(--primary-color);
+    background: #f0f8ff;
+}
+
+.upload-area i {
+    font-size: 2.5rem;
+    color: var(--gray-color);
+    margin-bottom: 1rem;
+}
+
+.upload-area p {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--dark-color);
+}
+
+.upload-area span {
+    font-size: 0.9rem;
+    color: var(--gray-color);
+}
+
+/* Mobile-specific image upload styles */
+@media (max-width: 768px) {
+    .upload-area {
+        min-height: 140px !important;
+        padding: 2rem 1rem !important;
+        border: 2px dashed #d1d9e6 !important;
+        background: #fafbfc !important;
+    }
+    
+    .upload-area:active {
+        background: #f0f8ff !important;
+        border-color: var(--primary-color) !important;
+        transform: scale(0.98);
+    }
+    
+    .upload-area i {
+        font-size: 2rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+    
+    .upload-area p {
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .upload-area span {
+        font-size: 0.85rem !important;
+    }
+    
+    .image-preview {
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+    
+    .preview-image {
+        width: 90px !important;
+        height: 90px !important;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .preview-image img {
+        border-radius: 10px;
+    }
+    
+    .preview-image .remove-image {
+        width: 24px;
+        height: 24px;
+        font-size: 1rem;
+        background: rgba(255, 0, 0, 0.8);
+    }
+}
+
+/* Product Card Mobile Improvements */
+@media (max-width: 768px) {
+    .product-card {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.2s ease;
+    }
+    
+    .product-card:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+}
+
+/* Floating Cards Mobile Fix */
+@media (max-width: 768px) {
+    .floating-cards-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5rem !important;
+        height: auto !important;
+        margin-top: 2rem !important;
+    }
+    
+    .floating-card {
+        position: relative !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 300px !important;
+        animation: none !important;
+    }
+    
+    .card-1, .card-2, .card-3 {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+    }
+}

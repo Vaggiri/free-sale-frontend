@@ -6,16 +6,33 @@ class UIManager {
     }
     
     init() {
+        console.log('🔄 Initializing UIManager...');
         this.setupEventListeners();
         this.setupPageTransitions();
-        this.setupMobileEventListeners(); // This method was missing
+        this.setupMobileEventListeners();
         this.setupModalHandlers();
         this.setupImageUpload();
         this.handleResize();
         window.addEventListener('resize', () => this.handleResize());
+        
+        // Initialize mobile overlay if it doesn't exist
+        this.ensureMobileOverlay();
+        
+        console.log('✅ UIManager initialized successfully');
+    }
+    
+    ensureMobileOverlay() {
+        if (!document.querySelector('.mobile-overlay')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'mobile-overlay';
+            document.body.appendChild(overlay);
+            console.log('✅ Mobile overlay created');
+        }
     }
     
     setupEventListeners() {
+        console.log('🔧 Setting up event listeners...');
+        
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', (e) => {
@@ -44,29 +61,41 @@ class UIManager {
         console.log('✅ Event listeners setup complete');
     }
     
-    // ADD THIS MISSING METHOD
     setupMobileEventListeners() {
         console.log('📱 Setting up mobile event listeners...');
         
-        // Mobile menu toggle
         const navToggle = document.querySelector('.nav-toggle');
         const navMenu = document.querySelector('.nav-menu');
         const mobileOverlay = document.querySelector('.mobile-overlay');
 
-        if (navToggle && navMenu) {
+        // Hamburger menu toggle
+        if (navToggle) {
             navToggle.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
+                console.log('🍔 Hamburger clicked');
                 this.toggleMobileMenu();
+            });
+            
+            // Add touch feedback
+            navToggle.addEventListener('touchstart', () => {
+                navToggle.style.transform = 'scale(0.95)';
+            });
+            
+            navToggle.addEventListener('touchend', () => {
+                navToggle.style.transform = 'scale(1)';
             });
         }
 
+        // Mobile overlay click
         if (mobileOverlay) {
             mobileOverlay.addEventListener('click', () => {
+                console.log('📱 Overlay clicked');
                 this.closeMobileMenu();
             });
         }
 
-        // Close mobile menu when clicking on links
+        // Close menu when clicking on links
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
@@ -75,12 +104,10 @@ class UIManager {
             });
         });
 
-        // Close menu when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768 && navMenu && navMenu.classList.contains('active')) {
-                if (!e.target.closest('.nav-menu') && !e.target.closest('.nav-toggle')) {
-                    this.closeMobileMenu();
-                }
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.isMobileMenuOpen()) {
+                this.closeMobileMenu();
             }
         });
 
@@ -127,32 +154,46 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
+            // Make upload area touch-friendly
             uploadArea.style.cursor = 'pointer';
-            uploadArea.style.minHeight = '120px';
+            uploadArea.style.minHeight = '150px';
             uploadArea.style.display = 'flex';
             uploadArea.style.flexDirection = 'column';
             uploadArea.style.alignItems = 'center';
             uploadArea.style.justifyContent = 'center';
             
             // Click handler
-            uploadArea.addEventListener('click', () => {
+            uploadArea.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('📱 Upload area clicked');
                 fileInput.click();
             });
             
-            // Touch events for mobile
+            // Enhanced touch events for mobile
             uploadArea.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                uploadArea.style.backgroundColor = '#f0f0f0';
+                console.log('📱 Touch start on upload area');
+                uploadArea.classList.add('drag-over');
+                uploadArea.style.backgroundColor = '#f0f8ff';
+            });
+            
+            uploadArea.addEventListener('touchmove', (e) => {
+                e.preventDefault();
             });
             
             uploadArea.addEventListener('touchend', (e) => {
                 e.preventDefault();
+                console.log('📱 Touch end on upload area');
+                uploadArea.classList.remove('drag-over');
                 uploadArea.style.backgroundColor = '';
-                fileInput.click();
+                
+                // Trigger file input click
+                setTimeout(() => {
+                    fileInput.click();
+                }, 100);
             });
             
-            // Drag and drop
+            // Desktop drag and drop
             uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.classList.add('drag-over');
@@ -166,60 +207,94 @@ class UIManager {
                 e.preventDefault();
                 uploadArea.classList.remove('drag-over');
                 const files = e.dataTransfer.files;
+                console.log('📁 Files dropped:', files.length);
                 this.handleImageFiles(files);
             });
             
+            // File input change
             fileInput.addEventListener('change', (e) => {
+                console.log('📁 File input changed:', e.target.files.length);
                 this.handleImageFiles(e.target.files);
+                
+                // Reset the input to allow selecting same file again
+                fileInput.value = '';
             });
+            
+            // Prevent default behavior
+            fileInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            console.log('✅ Image upload setup complete');
+        } else {
+            console.error('❌ Image upload elements not found');
         }
     }
     
     handleImageFiles(files) {
+        console.log('🖼️ Handling image files:', files.length);
         const imagePreview = document.getElementById('image-preview');
-        if (!imagePreview) return;
+        if (!imagePreview) {
+            console.error('❌ Image preview container not found');
+            return;
+        }
+        
+        // Clear existing previews if needed
+        // imagePreview.innerHTML = '';
         
         Array.from(files).forEach(file => {
-            if (!file.type.startsWith('image/')) return;
+            if (!file.type.startsWith('image/')) {
+                console.log('❌ Skipping non-image file:', file.type);
+                return;
+            }
+            
+            console.log('✅ Processing image file:', file.name, file.type, file.size);
             
             const reader = new FileReader();
             reader.onload = (e) => {
                 const previewDiv = document.createElement('div');
                 previewDiv.className = 'preview-image';
                 previewDiv.innerHTML = `
-                    <img src="${e.target.result}" alt="Preview">
-                    <span class="remove-image">&times;</span>
+                    <img src="${e.target.result}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                    <span class="remove-image" style="position: absolute; top: 5px; right: 5px; background: rgba(255,0,0,0.8); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer;">×</span>
                 `;
                 
+                // Remove image on click
                 previewDiv.querySelector('.remove-image').addEventListener('click', (e) => {
                     e.stopPropagation();
                     previewDiv.remove();
+                    console.log('🗑️ Image removed from preview');
                 });
                 
                 imagePreview.appendChild(previewDiv);
+                console.log('✅ Image preview added');
             };
+            
+            reader.onerror = (error) => {
+                console.error('❌ Error reading file:', error);
+            };
+            
             reader.readAsDataURL(file);
         });
     }
     
     // MOBILE MENU METHODS
-    toggleMobileMenu() {
+    isMobileMenuOpen() {
         const navMenu = document.querySelector('.nav-menu');
-        const navToggle = document.querySelector('.nav-toggle');
-        const mobileOverlay = document.querySelector('.mobile-overlay');
-        
-        if (navMenu && navToggle) {
-            const isActive = navMenu.classList.contains('active');
-            
-            if (isActive) {
-                this.closeMobileMenu();
-            } else {
-                this.openMobileMenu();
-            }
+        return navMenu && navMenu.classList.contains('active');
+    }
+    
+    toggleMobileMenu() {
+        console.log('🍔 Toggling mobile menu');
+        if (this.isMobileMenuOpen()) {
+            this.closeMobileMenu();
+        } else {
+            this.openMobileMenu();
         }
     }
     
     openMobileMenu() {
+        console.log('📱 Opening mobile menu');
         const navMenu = document.querySelector('.nav-menu');
         const navToggle = document.querySelector('.nav-toggle');
         const mobileOverlay = document.querySelector('.mobile-overlay');
@@ -229,10 +304,14 @@ class UIManager {
             navToggle.classList.add('active');
             mobileOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
+            console.log('✅ Mobile menu opened');
+        } else {
+            console.error('❌ Mobile menu elements not found');
         }
     }
     
     closeMobileMenu() {
+        console.log('📱 Closing mobile menu');
         const navMenu = document.querySelector('.nav-menu');
         const navToggle = document.querySelector('.nav-toggle');
         const mobileOverlay = document.querySelector('.mobile-overlay');
@@ -242,10 +321,13 @@ class UIManager {
             navToggle.classList.remove('active');
             mobileOverlay.classList.remove('active');
             document.body.style.overflow = '';
+            console.log('✅ Mobile menu closed');
         }
     }
     
     navigateToPage(page) {
+        console.log(`🔄 Navigating to page: ${page}`);
+        
         // Hide current page
         const currentPageElement = document.getElementById(`${this.currentPage}-page`);
         if (currentPageElement) {
@@ -277,7 +359,7 @@ class UIManager {
     }
     
     loadPageContent(page) {
-        console.log(`🔄 Loading page: ${page}`);
+        console.log(`🔄 Loading page content: ${page}`);
         
         switch(page) {
             case 'find':
@@ -357,7 +439,10 @@ class UIManager {
         const modal = document.getElementById('product-modal');
         const content = document.getElementById('product-detail-content');
         
-        if (!modal || !content) return;
+        if (!modal || !content) {
+            console.error('❌ Product modal elements not found');
+            return;
+        }
         
         const categoryMap = {
             'books': 'Books', 'electronics': 'Electronics', 'cycles': 'Cycles',
@@ -371,7 +456,7 @@ class UIManager {
 
         content.innerHTML = `
             <div class="product-detail-mobile-header" style="display: none; padding: 1rem; border-bottom: 1px solid #e9ecef;">
-                <button class="back-button" onclick="uiManager.closeAllModals()" style="background: none; border: none; color: #4361ee; font-size: 1rem; cursor: pointer;">
+                <button class="back-button" onclick="window.uiManager.closeAllModals()" style="background: none; border: none; color: #4361ee; font-size: 1rem; cursor: pointer;">
                     <i class="fas fa-arrow-left"></i> Back
                 </button>
             </div>
@@ -515,7 +600,9 @@ class UIManager {
     }
     
     handleResize() {
-        // Handle resize if needed
+        if (this.isMobile() && this.isMobileMenuOpen()) {
+            this.closeMobileMenu();
+        }
     }
 
     showLoading() {
@@ -560,6 +647,7 @@ class UIManager {
     }
 }
 
-// Initialize UI Manager - Make sure this is at the end
+// Initialize UI Manager
 const uiManager = new UIManager();
-window.uiManager = uiManager; // Make it globally available
+window.uiManager = uiManager;
+console.log('🌐 UIManager added to window');
