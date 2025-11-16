@@ -40,11 +40,30 @@ class UIManager {
         
         // Mobile menu toggle
         const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
         if (navToggle) {
             navToggle.addEventListener('click', () => {
-                this.toggleMobileMenu();
+                navMenu.classList.toggle('active');
+                navToggle.classList.toggle('active');
             });
         }
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-container')) {
+                navMenu.classList.remove('active');
+                navToggle.classList.remove('active');
+            }
+        });
         
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
