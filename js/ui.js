@@ -285,9 +285,21 @@ class UIManager {
             navMenu.classList.add('active');
             navToggle.classList.add('active');
             mobileOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('menu-open');
             
-            console.log('✅ Mobile menu opened');
+            console.log('✅ Mobile menu opened - Classes added');
+            
+            // Debug: Check actual positions
+            setTimeout(() => {
+                const rect = navMenu.getBoundingClientRect();
+                console.log('📐 Menu position:', {
+                    left: rect.left,
+                    top: rect.top,
+                    width: rect.width,
+                    height: rect.height,
+                    visible: rect.width > 0 && rect.height > 0
+                });
+            }, 100);
         } else {
             console.error('❌ Mobile menu elements not found');
         }
@@ -303,7 +315,7 @@ class UIManager {
             navMenu.classList.remove('active');
             navToggle.classList.remove('active');
             mobileOverlay.classList.remove('active');
-            document.body.style.overflow = '';
+            document.body.classList.remove('menu-open');
             
             console.log('✅ Mobile menu closed');
         }

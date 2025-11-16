@@ -427,6 +427,59 @@
                 }
             }
             </style>
+            <style id="mobile-menu-fix">
+                /* EMERGENCY MOBILE FIX */
+                @media (max-width: 768px) {
+                    .nav-menu {
+                        all: unset !important;
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: -280px !important;
+                        width: 280px !important;
+                        height: 100vh !important;
+                        background: #ffffff !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        padding: 80px 0 20px 0 !important;
+                        box-shadow: 2px 0 15px rgba(0,0,0,0.1) !important;
+                        z-index: 1000 !important;
+                        transition: left 0.3s ease !important;
+                    }
+                    
+                    .nav-menu.active {
+                        left: 0 !important;
+                    }
+                    
+                    .nav-menu > * {
+                        all: unset !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        padding: 15px 20px !important;
+                        border-bottom: 1px solid #f0f0f0 !important;
+                        color: #333333 !important;
+                        text-decoration: none !important;
+                        font-size: 16px !important;
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+                    
+                    .mobile-overlay {
+                        all: unset !important;
+                        display: none !important;
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100vw !important;
+                        height: 100vh !important;
+                        background: rgba(0,0,0,0.5) !important;
+                        z-index: 999 !important;
+                    }
+                    
+                    .mobile-overlay.active {
+                        display: block !important;
+                    }
+                }
+                </style>
 
 </body>
 </html>
