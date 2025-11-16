@@ -156,7 +156,7 @@ class UIManager {
         if (uploadArea && fileInput && imagePreview) {
             console.log('✅ Image upload elements found');
             
-            // Reset file input attributes for mobile
+            // Reset and style file input for mobile
             fileInput.setAttribute('accept', 'image/*');
             fileInput.setAttribute('multiple', 'true');
             fileInput.style.display = 'block';
@@ -168,41 +168,47 @@ class UIManager {
             fileInput.style.opacity = '0';
             fileInput.style.cursor = 'pointer';
             fileInput.style.zIndex = '10';
+            fileInput.style.fontSize = '100px'; // Make it easier to tap
             
-            // Make upload area position relative
+            // Ensure upload area is clickable
             uploadArea.style.position = 'relative';
             uploadArea.style.overflow = 'hidden';
+            uploadArea.style.cursor = 'pointer';
             
-            // Enhanced click/touch handling
-            const triggerFileInput = () => {
-                console.log('📱 Triggering file input');
+            console.log('📱 File input styled for mobile:', {
+                width: fileInput.offsetWidth,
+                height: fileInput.offsetHeight,
+                position: fileInput.style.position
+            });
+            
+            // Simple click handler - MOST RELIABLE FOR MOBILE
+            uploadArea.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('📱 Upload area clicked');
                 fileInput.click();
-            };
+            });
             
-            // Click handler
-            uploadArea.addEventListener('click', triggerFileInput);
-            
-            // Touch events for mobile
+            // Touch events as backup
             uploadArea.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                console.log('📱 Touch start on upload area');
                 uploadArea.style.backgroundColor = '#f0f8ff';
                 uploadArea.style.borderColor = '#4361ee';
             });
             
             uploadArea.addEventListener('touchend', (e) => {
                 e.preventDefault();
-                console.log('📱 Touch end on upload area');
                 uploadArea.style.backgroundColor = '';
                 uploadArea.style.borderColor = '';
-                triggerFileInput();
+                fileInput.click();
             });
             
-            // File input change
+            // File input change handler
             fileInput.addEventListener('change', (e) => {
                 console.log('📁 File input changed, files:', e.target.files.length);
                 if (e.target.files.length > 0) {
                     this.handleImageFiles(e.target.files);
+                    // Reset to allow selecting same files again
+                    fileInput.value = '';
                 }
             });
             
@@ -226,7 +232,11 @@ class UIManager {
             
             console.log('✅ Image upload setup complete');
         } else {
-            console.error('❌ Image upload elements not found');
+            console.error('❌ Image upload elements not found:', {
+                uploadArea: !!uploadArea,
+                fileInput: !!fileInput,
+                imagePreview: !!imagePreview
+            });
         }
     }
     
