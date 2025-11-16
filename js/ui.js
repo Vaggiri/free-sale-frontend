@@ -433,9 +433,9 @@ getImageUrl(imagePath) {
     if (imagePath.startsWith('http')) {
         return imagePath;
     } else if (imagePath.startsWith('/')) {
-        return `http://localhost:5000${imagePath}`;
+        return `https://free-sale-backend.onrender.com${imagePath}`;
     } else {
-        return `http://localhost:5000/uploads/${imagePath}`;
+        return `https://free-sale-backend.onrender.com/uploads/${imagePath}`;
     }
 }
 

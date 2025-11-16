@@ -59,7 +59,7 @@ class NotificationsManager {
         }
         
         try {
-            this.socket = io('http://localhost:5000', {
+            this.socket = io('https://free-sale-backend.onrender.com', {
                 transports: ['websocket', 'polling'],
                 timeout: 10000
             });

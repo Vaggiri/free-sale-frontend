@@ -1,6 +1,6 @@
 // Profile Management
 class ProfileManager {
-    static API_BASE = 'http://localhost:5000/api';
+    static API_BASE = 'https://free-sale-backend.onrender.com/api';
     
     static async loadUserProfile() {
         if (!authManager.isLoggedIn()) {
@@ -101,7 +101,7 @@ class ProfileManager {
                     <!-- Product Image -->
                     <div class="listing-image" style="width: 120px; height: 120px; background: #f8f9fa; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
                         ${product.images && product.images.length > 0 ? 
-                            `<img src="http://localhost:5000/uploads/${product.images[0]}" alt="${product.title}" 
+                            `<img src="https://free-sale-backend.onrender.com/uploads/${product.images[0]}" alt="${product.title}" 
                                  style="width: 100%; height: 100%; object-fit: cover;"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
                              <div style="display: none; align-items: center; justify-content: center; height: 100%; color: #6c757d; background: #e9ecef;">

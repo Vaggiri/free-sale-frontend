@@ -8,7 +8,7 @@ class ProductManager {
             maxPrice: '',
             search: ''
         };
-        this.API_BASE = 'http://localhost:5000/api';
+        this.API_BASE = 'https://free-sale-backend.onrender.com/api';
         this.init();
     }
     
