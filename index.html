@@ -89,7 +89,7 @@
             </div>
         </div>
     </nav>
-    <div class="mobile-overlay"></div>
+   
     <main id="main-content">
         <section id="home-page" class="page active">
             <div class="hero-section">
@@ -204,7 +204,6 @@
             <div class="products-grid" id="products-container">
                 </div>
         </section>
-        <div class="mobile-overlay"></div>
         <section id="sell-page" class="page">
                 <div class="sell-form-container">
                     <form id="sell-form" class="sell-form" enctype="multipart/form-data">
@@ -362,6 +361,33 @@
     <script src="js/profile.js"></script>
     <script src="js/notifications.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        // DEBUG SCRIPT - Remove after testing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== 🐛 MOBILE MENU DEBUG ===');
+            
+            const navMenu = document.querySelector('.nav-menu');
+            const navToggle = document.querySelector('.nav-toggle');
+            
+            console.log('Nav Menu:', navMenu);
+            console.log('Nav Toggle:', navToggle);
+            console.log('Computed Styles:', {
+                display: window.getComputedStyle(navMenu).display,
+                visibility: window.getComputedStyle(navMenu).visibility,
+                opacity: window.getComputedStyle(navMenu).opacity,
+                position: window.getComputedStyle(navMenu).position,
+                left: window.getComputedStyle(navMenu).left,
+                zIndex: window.getComputedStyle(navMenu).zIndex
+            });
+            
+            // Force show menu for testing
+            setTimeout(() => {
+                console.log('🔄 Forcing menu open for testing...');
+                navMenu.classList.add('active');
+                document.querySelector('.mobile-overlay').classList.add('active');
+            }, 1000);
+        });
+        </script>
 
 </body>
 </html>
