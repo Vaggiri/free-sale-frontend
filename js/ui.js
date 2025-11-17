@@ -158,58 +158,36 @@ class UIManager {
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('product-images');
         const imagePreview = document.getElementById('image-preview');
-        const mobileUploadButton = document.getElementById('mobile-upload-button');
-        const uploadText = document.getElementById('upload-text');
         
         if (uploadArea && fileInput && imagePreview) {
             console.log('📱 Device type:', this.isMobile() ? 'Mobile' : 'Desktop');
             
-            // Show mobile-specific UI
-            if (this.isMobile()) {
-                if (mobileUploadButton) {
-                    mobileUploadButton.style.display = 'block';
-                }
-                if (uploadText) {
-                    uploadText.textContent = 'Tap below to choose photos';
-                }
-                console.log('📱 Mobile upload interface activated');
-            }
-            
-            // Reset upload area content
+            // Reset upload area content - SIMPLIFIED VERSION
             uploadArea.innerHTML = `
                 <i class="fas fa-cloud-upload-alt"></i>
-                <p id="upload-text">${this.isMobile() ? 'Tap below to choose photos' : 'Click to upload or drag and drop'}</p>
+                <p id="upload-text">${this.isMobile() ? 'Tap to choose photos' : 'Click to upload or drag and drop'}</p>
                 <span>PNG, JPG, JPEG up to 5MB</span>
                 <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
-                <button type="button" id="mobile-upload-button" style="${this.isMobile() ? 'display: block;' : 'display: none;'} margin-top: 10px; padding: 10px 15px; background: #4361ee; color: white; border: none; border-radius: 5px; font-size: 14px;">
-                    <i class="fas fa-camera"></i> Choose Photos
-                </button>
             `;
             
             // Get fresh references after innerHTML
             const freshFileInput = uploadArea.querySelector('#product-images');
-            const freshMobileButton = uploadArea.querySelector('#mobile-upload-button');
             
-            // Enhanced mobile detection
-            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            console.log('📱 Touch device:', isTouchDevice);
-            
-            // Style upload area for mobile
+            // Style upload area
             uploadArea.style.cssText = `
                 position: relative !important;
                 border: 2px dashed #e9ecef !important;
                 border-radius: 8px !important;
-                padding: ${this.isMobile() ? '1.5rem' : '2rem'} !important;
+                padding: 2rem !important;
                 text-align: center !important;
                 cursor: pointer !important;
                 transition: all 0.3s ease !important;
-                min-height: ${this.isMobile() ? '120px' : '150px'} !important;
+                min-height: 150px !important;
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 justify-content: center !important;
                 background: #f8f9fa !important;
-                -webkit-tap-highlight-color: transparent !important;
             `;
             
             // Style file input
@@ -222,53 +200,21 @@ class UIManager {
                 opacity: 0 !important;
                 cursor: pointer !important;
                 z-index: 10 !important;
-                font-size: 16px !important; /* Prevent zoom on iOS */
             `;
             
-            // MOBILE-SPECIFIC FIXES:
-            
-            // 1. Mobile button click handler
-            if (freshMobileButton) {
-                freshMobileButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('📱 Mobile upload button clicked');
-                    freshFileInput.click();
-                });
-                
-                // Add touch feedback
-                freshMobileButton.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                    this.style.opacity = '0.8';
-                });
-                
-                freshMobileButton.addEventListener('touchend', function() {
-                    this.style.transform = 'scale(1)';
-                    this.style.opacity = '1';
-                });
-            }
-            
-            // 2. Enhanced click/touch handler for upload area
+            // Enhanced click handler for upload area
             const handleUploadClick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('📱 Upload area triggered');
-                
-                // Force file input click with timeout for mobile
-                setTimeout(() => {
-                    freshFileInput.click();
-                }, 100);
+                console.log('📱 Upload area clicked');
+                freshFileInput.click();
             };
             
-            // Use both click and touch events for mobile
-            if (isTouchDevice) {
-                uploadArea.addEventListener('touchstart', handleUploadClick, { passive: false });
-                uploadArea.addEventListener('touchend', (e) => e.preventDefault());
-            } else {
-                uploadArea.addEventListener('click', handleUploadClick);
-            }
+            // Use both click and touch events
+            uploadArea.addEventListener('click', handleUploadClick);
+            uploadArea.addEventListener('touchstart', handleUploadClick, { passive: false });
             
-            // 3. Enhanced file input change handler
+            // Enhanced file input change handler
             const handleFileChange = (e) => {
                 console.log('📁 File input changed on:', this.isMobile() ? 'Mobile' : 'Desktop');
                 console.log('📁 Files:', e.target.files);
@@ -283,22 +229,18 @@ class UIManager {
             
             freshFileInput.addEventListener('change', handleFileChange);
             
-            // 4. Mobile-specific event for camera capture
-            freshFileInput.setAttribute('capture', 'environment'); // Rear camera
-            freshFileInput.setAttribute('accept', 'image/*');
-            
-            // 5. Add visual feedback for mobile
-            uploadArea.addEventListener('touchstart', function() {
-                this.style.backgroundColor = '#e3f2fd';
-                this.style.borderColor = '#2196f3';
+            // Add visual feedback
+            uploadArea.addEventListener('mouseenter', function() {
+                this.style.borderColor = '#4361ee';
+                this.style.backgroundColor = '#f0f8ff';
             });
             
-            uploadArea.addEventListener('touchend', function() {
-                this.style.backgroundColor = '#f8f9fa';
+            uploadArea.addEventListener('mouseleave', function() {
                 this.style.borderColor = '#e9ecef';
+                this.style.backgroundColor = '#f8f9fa';
             });
             
-            console.log('✅ Mobile image upload setup complete');
+            console.log('✅ Image upload setup complete');
             
         } else {
             console.error('❌ Image upload elements not found');

@@ -232,6 +232,8 @@ class ProductManager {
             const firstImage = product.images && product.images.length > 0 ? product.images[0] : null;
             const imageUrl = firstImage ? this.getImageUrl(firstImage) : null;
             
+            console.log(`🖼️ Product "${product.title}" image:`, imageUrl); // Debug log
+            
             return `
                 <div class="product-card" data-id="${product._id || product.id}" 
                      style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease; cursor: pointer;">
@@ -241,12 +243,14 @@ class ProductManager {
                             `<img src="${imageUrl}" 
                                   alt="${product.title}"
                                   style="width: 100%; height: 100%; object-fit: cover;"
-                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                                  onerror="console.error('❌ Image failed to load:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex'">
                              <div class="image-fallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; color: #6c757d; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #f8f9fa;">
                                  <i class="fas fa-image" style="font-size: 2rem;"></i>
+                                 <small>Image not available</small>
                              </div>` : 
                             `<div class="no-image" style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: #6c757d;">
                                  <i class="fas fa-image" style="font-size: 2rem;"></i>
+                                 <small>No image</small>
                              </div>`
                         }
                     </div>
@@ -452,9 +456,23 @@ class ProductManager {
     
     getImageUrl(imagePath) {
         if (!imagePath) return '';
+        
+        // If it's already a full URL, return as is
         if (imagePath.startsWith('http')) return imagePath;
+        
+        // If it's a data URL (base64), return as is
         if (imagePath.startsWith('data:image')) return imagePath;
-        return `${Config.UPLOADS_BASE}/${imagePath}`;
+        
+        // For uploaded images, construct the proper URL
+        // Use the same base URL as your API
+        const baseUrl = 'https://free-sale-backend.onrender.com';
+        
+        // Check if the image path already includes the uploads folder
+        if (imagePath.includes('uploads/')) {
+            return `${baseUrl}/${imagePath}`;
+        } else {
+            return `${baseUrl}/uploads/${imagePath}`;
+        }
     }
     
     escapeHtml(text) {

@@ -998,3 +998,52 @@ main {
         font-size: 16px !important;
     }
 }
+/* Upload Area Fixes */
+.upload-area {
+    position: relative !important;
+    border: 2px dashed #e9ecef !important;
+    border-radius: 8px !important;
+    padding: 2rem !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    min-height: 150px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #f8f9fa !important;
+}
+
+.upload-area:hover {
+    border-color: #4361ee !important;
+    background: #f0f8ff !important;
+}
+
+.upload-area i {
+    font-size: 2rem !important;
+    color: #6c757d !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.upload-area p {
+    margin-bottom: 0.25rem !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
+}
+
+.upload-area span {
+    font-size: 0.8rem !important;
+    color: #6c757d !important;
+}
+
+#product-images {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+}
