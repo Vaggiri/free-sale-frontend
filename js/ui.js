@@ -156,80 +156,104 @@ class UIManager {
     setupImageUpload() {
         console.log('🖼️ Setting up image upload...');
         const uploadArea = document.getElementById('upload-area');
-        const fileInput = document.getElementById('product-images');
         const imagePreview = document.getElementById('image-preview');
         
-        if (uploadArea && fileInput && imagePreview) {
+        if (uploadArea && imagePreview) {
             console.log('📱 Device type:', this.isMobile() ? 'Mobile' : 'Desktop');
             
-            // Reset upload area content - SIMPLIFIED VERSION
+            // Clear and rebuild upload area with proper structure
             uploadArea.innerHTML = `
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p id="upload-text">${this.isMobile() ? 'Tap to choose photos' : 'Click to upload or drag and drop'}</p>
-                <span>PNG, JPG, JPEG up to 5MB</span>
-                <input type="file" id="product-images" name="images" multiple accept="image/*" style="display: none;">
+                <div class="upload-content" style="text-align: center; z-index: 1; position: relative;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #6c757d; margin-bottom: 0.5rem;"></i>
+                    <p id="upload-text" style="margin-bottom: 0.25rem; font-weight: 500; color: #495057;">
+                        ${this.isMobile() ? 'Tap below to upload photos' : 'Click the button or drag and drop'}
+                    </p>
+                    <span style="font-size: 0.8rem; color: #6c757d; display: block; margin-bottom: 1rem;">
+                        PNG, JPG, JPEG up to 5MB
+                    </span>
+                    <button type="button" id="upload-button" class="btn-primary" 
+                            style="padding: 0.75rem 1.5rem; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-camera"></i> Choose Photos
+                    </button>
+                </div>
+                <input type="file" id="product-images" name="images" multiple accept="image/*" 
+                       style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;">
             `;
             
-            // Get fresh references after innerHTML
-            const freshFileInput = uploadArea.querySelector('#product-images');
+            // Get fresh references
+            const fileInput = uploadArea.querySelector('#product-images');
+            const uploadButton = uploadArea.querySelector('#upload-button');
             
-            // Style upload area
+            // Style the upload area
             uploadArea.style.cssText = `
-                position: relative !important;
-                border: 2px dashed #e9ecef !important;
-                border-radius: 8px !important;
-                padding: 2rem !important;
-                text-align: center !important;
-                cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                min-height: 150px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                justify-content: center !important;
-                background: #f8f9fa !important;
+                position: relative;
+                border: 2px dashed #e9ecef;
+                border-radius: 8px;
+                padding: 2rem;
+                background: #f8f9fa;
+                transition: all 0.3s ease;
+                min-height: 180px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
             `;
             
-            // Style file input
-            freshFileInput.style.cssText = `
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                opacity: 0 !important;
-                cursor: pointer !important;
-                z-index: 10 !important;
-            `;
+            // Upload button click handler
+            if (uploadButton) {
+                uploadButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('📱 Upload button clicked');
+                    fileInput.click();
+                });
+            }
             
-            // Enhanced click handler for upload area
-            const handleUploadClick = (e) => {
+            // Upload area click handler (for drag & drop area)
+            uploadArea.addEventListener('click', (e) => {
+                // Only trigger if clicking directly on the upload area, not the button
+                if (e.target === uploadArea || e.target.classList.contains('upload-content')) {
+                    console.log('📁 Upload area clicked');
+                    fileInput.click();
+                }
+            });
+            
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                console.log('📱 Upload area clicked');
-                freshFileInput.click();
-            };
+                uploadArea.style.borderColor = '#4361ee';
+                uploadArea.style.backgroundColor = '#f0f8ff';
+            });
             
-            // Use both click and touch events
-            uploadArea.addEventListener('click', handleUploadClick);
-            uploadArea.addEventListener('touchstart', handleUploadClick, { passive: false });
+            uploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#e9ecef';
+                uploadArea.style.backgroundColor = '#f8f9fa';
+            });
             
-            // Enhanced file input change handler
-            const handleFileChange = (e) => {
-                console.log('📁 File input changed on:', this.isMobile() ? 'Mobile' : 'Desktop');
-                console.log('📁 Files:', e.target.files);
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#e9ecef';
+                uploadArea.style.backgroundColor = '#f8f9fa';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    console.log('📁 Files dropped:', e.dataTransfer.files.length);
+                    fileInput.files = e.dataTransfer.files;
+                    this.handleImageFiles(e.dataTransfer.files);
+                }
+            });
+            
+            // File input change handler
+            fileInput.addEventListener('change', (e) => {
+                console.log('📁 File input changed');
+                console.log('📁 Selected files:', e.target.files);
                 
                 if (e.target.files && e.target.files.length > 0) {
-                    console.log('📁 Processing files:', e.target.files.length);
                     this.handleImageFiles(e.target.files);
-                } else {
-                    console.warn('⚠️ No files selected or files array empty');
                 }
-            };
+            });
             
-            freshFileInput.addEventListener('change', handleFileChange);
-            
-            // Add visual feedback
+            // Visual feedback
             uploadArea.addEventListener('mouseenter', function() {
                 this.style.borderColor = '#4361ee';
                 this.style.backgroundColor = '#f0f8ff';
@@ -240,10 +264,19 @@ class UIManager {
                 this.style.backgroundColor = '#f8f9fa';
             });
             
-            console.log('✅ Image upload setup complete');
+            // Touch feedback for mobile
+            uploadArea.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            uploadArea.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+            
+            console.log('✅ Image upload setup complete - Button enabled for all devices');
             
         } else {
-            console.error('❌ Image upload elements not found');
+            console.error('❌ Upload area or image preview not found');
         }
     }
     

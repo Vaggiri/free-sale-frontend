@@ -998,52 +998,56 @@ main {
         font-size: 16px !important;
     }
 }
-/* Upload Area Fixes */
+/* Enhanced Upload Area Styles */
 .upload-area {
-    position: relative !important;
-    border: 2px dashed #e9ecef !important;
-    border-radius: 8px !important;
-    padding: 2rem !important;
-    text-align: center !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    min-height: 150px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: #f8f9fa !important;
+    position: relative;
+    border: 2px dashed #e9ecef;
+    border-radius: 8px;
+    padding: 2rem;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .upload-area:hover {
-    border-color: #4361ee !important;
-    background: #f0f8ff !important;
+    border-color: #4361ee;
+    background: #f0f8ff;
 }
 
-.upload-area i {
-    font-size: 2rem !important;
-    color: #6c757d !important;
-    margin-bottom: 0.5rem !important;
+.upload-area.dragover {
+    border-color: #4361ee;
+    background: #e3f2fd;
+    transform: scale(1.02);
 }
 
-.upload-area p {
-    margin-bottom: 0.25rem !important;
-    font-weight: 500 !important;
-    color: #495057 !important;
+.upload-content {
+    text-align: center;
+    z-index: 1;
 }
 
-.upload-area span {
-    font-size: 0.8rem !important;
-    color: #6c757d !important;
+#upload-button {
+    transition: all 0.3s ease;
 }
 
-#product-images {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    opacity: 0 !important;
-    cursor: pointer !important;
-    z-index: 10 !important;
+#upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .upload-area {
+        min-height: 160px;
+        padding: 1.5rem;
+    }
+    
+    #upload-button {
+        min-height: 44px;
+        min-width: 44px;
+        font-size: 16px;
+    }
 }

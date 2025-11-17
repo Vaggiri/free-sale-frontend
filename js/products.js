@@ -24,6 +24,16 @@ class ProductManager {
             }
         });
     }
+    async testImageUrl(url) {
+        try {
+            const response = await fetch(url, { method: 'HEAD' });
+            console.log(`🖼️ Image URL ${url} status:`, response.status);
+            return response.ok;
+        } catch (error) {
+            console.error(`🖼️ Image URL ${url} error:`, error);
+            return false;
+        }
+    }
     
     setupEventListeners() {
         console.log('🔧 Setting up product event listeners...');
@@ -204,7 +214,7 @@ class ProductManager {
         this.displayProducts(this.products);
     }
     
-    displayProducts(products) {
+    async displayProducts(products) {
         const container = document.getElementById('products-container');
         
         if (!container) {
@@ -278,6 +288,16 @@ class ProductManager {
         
         // Add click events to product cards
         this.attachProductClickEvents();
+        console.log(`🎨 Rendering ${products.length} products...`);
+    
+        // Test image URLs before rendering
+        for (let product of products) {
+            if (product.images && product.images.length > 0) {
+                const imageUrl = this.getImageUrl(product.images[0]);
+                console.log(`🖼️ Testing image for "${product.title}":`, imageUrl);
+                await this.testImageUrl(imageUrl);
+            }
+        }
     }
     
     attachProductClickEvents() {
@@ -457,22 +477,27 @@ class ProductManager {
     getImageUrl(imagePath) {
         if (!imagePath) return '';
         
+        console.log('🖼️ Original image path:', imagePath); // Debug log
+        
         // If it's already a full URL, return as is
         if (imagePath.startsWith('http')) return imagePath;
         
         // If it's a data URL (base64), return as is
         if (imagePath.startsWith('data:image')) return imagePath;
         
-        // For uploaded images, construct the proper URL
-        // Use the same base URL as your API
+        // For uploaded images, try different URL patterns
         const baseUrl = 'https://free-sale-backend.onrender.com';
         
-        // Check if the image path already includes the uploads folder
-        if (imagePath.includes('uploads/')) {
-            return `${baseUrl}/${imagePath}`;
-        } else {
-            return `${baseUrl}/uploads/${imagePath}`;
-        }
+        // Remove any leading slashes or uploads/ prefixes to avoid double paths
+        let cleanPath = imagePath;
+        if (cleanPath.startsWith('/')) cleanPath = cleanPath.substring(1);
+        if (cleanPath.startsWith('uploads/')) cleanPath = cleanPath.substring(8);
+        
+        // Try the most common pattern first
+        const imageUrl = `${baseUrl}/uploads/${cleanPath}`;
+        console.log('🖼️ Constructed image URL:', imageUrl);
+        
+        return imageUrl;
     }
     
     escapeHtml(text) {
