@@ -161,7 +161,7 @@ class UIManager {
         if (uploadArea && imagePreview) {
             console.log('📱 Device type:', this.isMobile() ? 'Mobile' : 'Desktop');
             
-            // Clear and rebuild upload area with proper structure
+            // ✅ FIX: Changed accept attribute to strictly standard image formats
             uploadArea.innerHTML = `
                 <div class="upload-content" style="text-align: center; z-index: 1; position: relative;">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #6c757d; margin-bottom: 0.5rem;"></i>
@@ -176,7 +176,7 @@ class UIManager {
                         <i class="fas fa-camera"></i> Choose Photos
                     </button>
                 </div>
-                <input type="file" id="product-images" name="images" multiple accept="image/*" 
+                <input type="file" id="product-images" name="images" multiple accept="image/jpeg, image/png, image/jpg, image/webp" 
                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;">
             `;
             
@@ -204,16 +204,13 @@ class UIManager {
                 uploadButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('📱 Upload button clicked');
                     fileInput.click();
                 });
             }
             
             // Upload area click handler (for drag & drop area)
             uploadArea.addEventListener('click', (e) => {
-                // Only trigger if clicking directly on the upload area, not the button
                 if (e.target === uploadArea || e.target.classList.contains('upload-content')) {
-                    console.log('📁 Upload area clicked');
                     fileInput.click();
                 }
             });
@@ -237,7 +234,6 @@ class UIManager {
                 uploadArea.style.backgroundColor = '#f8f9fa';
                 
                 if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                    console.log('📁 Files dropped:', e.dataTransfer.files.length);
                     fileInput.files = e.dataTransfer.files;
                     this.handleImageFiles(e.dataTransfer.files);
                 }
@@ -245,9 +241,6 @@ class UIManager {
             
             // File input change handler
             fileInput.addEventListener('change', (e) => {
-                console.log('📁 File input changed');
-                console.log('📁 Selected files:', e.target.files);
-                
                 if (e.target.files && e.target.files.length > 0) {
                     this.handleImageFiles(e.target.files);
                 }
@@ -273,33 +266,24 @@ class UIManager {
                 this.style.transform = 'scale(1)';
             });
             
-            console.log('✅ Image upload setup complete - Button enabled for all devices');
-            
         } else {
             console.error('❌ Upload area or image preview not found');
         }
     }
     
     handleImageFiles(files) {
-        console.log('🖼️ Handling image files on:', this.isMobile() ? 'Mobile' : 'Desktop');
-        console.log('📁 Files received:', files.length);
-        
         const imagePreview = document.getElementById('image-preview');
-        const fileInput = document.getElementById('product-images');
         
         if (!imagePreview) {
-            console.error('❌ Image preview container not found');
             this.showMessage('Image preview area not found', 'error');
             return;
         }
         
         if (!files || files.length === 0) {
-            console.warn('⚠️ No files to process');
             this.showMessage('No images selected', 'warning');
             return;
         }
         
-        // Clear existing previews
         imagePreview.innerHTML = '';
         
         let processedFiles = 0;
@@ -309,16 +293,15 @@ class UIManager {
             this.showMessage(`Maximum ${maxFiles} images allowed`, 'warning');
         }
         
-        // Convert FileList to Array for mobile compatibility
         const filesArray = Array.from(files).slice(0, maxFiles);
         
-        console.log('🖼️ Processing files:', filesArray.length);
+        // ✅ FIX: Strict validation array mapped to the backend capabilities
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
         
         filesArray.forEach((file, index) => {
-            // Enhanced file validation
-            if (!file.type.startsWith('image/')) {
-                console.log('❌ Skipping non-image file:', file.type, file.name);
-                this.showMessage(`Skipped non-image: ${file.name}`, 'warning');
+            if (!validTypes.includes(file.type)) {
+                console.log('❌ Skipping unsupported file:', file.type, file.name);
+                this.showMessage(`Skipped unsupported format: ${file.name}. Please use JPG or PNG.`, 'warning');
                 return;
             }
             
@@ -328,48 +311,37 @@ class UIManager {
                 return;
             }
             
-            console.log(`✅ Processing image ${index + 1}:`, file.name, file.type, file.size);
-            
             const reader = new FileReader();
             
             reader.onload = (e) => {
                 processedFiles++;
-                console.log(`✅ Image ${index + 1} loaded successfully`);
-                
                 this.createImagePreview(e.target.result, file.name, imagePreview);
                 this.updateImageCounter();
             };
             
             reader.onerror = (error) => {
-                console.error('❌ Error reading file:', error, file.name);
                 this.showMessage(`Error reading: ${file.name}`, 'error');
             };
             
-            reader.onabort = () => {
-                console.warn('⚠️ File reading aborted:', file.name);
-            };
-            
-            // Read the file
             try {
                 reader.readAsDataURL(file);
             } catch (error) {
-                console.error('❌ Failed to read file:', error, file.name);
                 this.showMessage(`Failed to read: ${file.name}`, 'error');
             }
         });
         
-        // Update success message
         setTimeout(() => {
             if (processedFiles > 0) {
-                const message = `✅ ${processedFiles} image(s) selected`;
-                console.log(message);
-                this.showMessage(message, 'success');
+                this.showMessage(`✅ ${processedFiles} image(s) selected`, 'success');
             } else {
-                console.warn('⚠️ No files were processed successfully');
                 this.showMessage('No valid images selected', 'warning');
+                // Optional: clear out the hidden file input if everything failed
+                document.getElementById('product-images').value = "";
             }
         }, 1000);
     }
+    
+    
     
     // Helper method to create image preview
     createImagePreview(dataUrl, fileName, container) {
