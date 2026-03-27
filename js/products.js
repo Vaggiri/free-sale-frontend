@@ -319,7 +319,7 @@ class ProductManager {
         });
     }
     
-    async handleSellProduct() {
+		async handleSellProduct() {
         if (!authManager.isLoggedIn()) {
             if (window.uiManager) {
                 window.uiManager.showAuthModal();
@@ -333,7 +333,9 @@ class ProductManager {
         const price = document.getElementById('product-price').value;
         const category = document.getElementById('product-category').value;
         const meetupLocation = document.getElementById('meetup-location').value;
-        const condition = 'good';
+        
+        // ✅ FIX: Get the actual condition from the dropdown
+        const condition = document.getElementById('product-condition').value; 
         
         const imageFiles = document.getElementById('product-images').files;
         console.log('📝 Form data:', {
@@ -346,7 +348,7 @@ class ProductManager {
             console.log(`📁 File ${i + 1}:`, imageFiles[i].name, imageFiles[i].size, imageFiles[i].type);
         }
         
-        if (!title || !description || !price || !category || !meetupLocation) {
+        if (!title || !description || !price || !category || !meetupLocation || !condition) {
             if (window.uiManager) {
                 window.uiManager.showMessage('Please fill in all required fields', 'error');
             }
@@ -373,7 +375,7 @@ class ProductManager {
             formData.append('price', parseFloat(price));
             formData.append('category', category);
             formData.append('meetupLocation', meetupLocation);
-            formData.append('condition', condition);
+            formData.append('condition', condition); // Now sending actual condition
             
             for (let i = 0; i < imageFiles.length; i++) {
                 formData.append('images', imageFiles[i]);
